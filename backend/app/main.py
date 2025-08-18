@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from .database import get_db, engine
+from .database import get_db, engine, create_tables
+from .models import User, Pet, Shelter, UserFavorite
 from sqlalchemy import text
 
 
@@ -37,6 +38,14 @@ def test_database(db: Session = Depends(get_db)):
         return {"message": "Database connection successful!", "result": result.scalar()}
     except Exception as e:
         return {"message": "Database connection failed!", "error": str(e)}
+
+@app.post("/create-tables")
+def create_database_tables():
+    try:
+        create_tables()
+        return {"message": "Database tables created successfully!"}
+    except Exception as e:
+        return {"message": "Failed to create tables", "error": str(e)}
 
 if __name__ == "__main__":
     import uvicorn
