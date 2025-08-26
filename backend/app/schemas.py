@@ -16,14 +16,14 @@ class PetBase(BaseModel):
     name: str
     pet_type: PetType
     breed: Optional[str] = None
-    age_years: Optional[int] = None
+    age_years: int
     age_months: Optional[int] = None
     size: PetSize
     weight: Optional[float] = None
     color: Optional[str] = None
     gender: Optional[str] = None
     is_spayed_neutered: Optional[bool] = False
-    temperament: Optional[str] = None
+    temperament: str
     activity_level: Optional[ActivityLevel] = None
     good_with_kids: Optional[bool] = False
     good_with_dogs: Optional[bool] = False
@@ -33,7 +33,7 @@ class PetBase(BaseModel):
     special_needs: Optional[str] = None
     vaccination_status: Optional[str] = None
     adoption_status: Optional[AdoptionStatus] = AdoptionStatus.AVAILABLE
-    adoption_fee: Optional[float] = None
+    adoption_fee: float
     description: Optional[str] = None
     primary_photo_url: Optional[str] = None
     additional_photos: Optional[str] = None
@@ -77,6 +77,20 @@ class Pet(PetBase):
         from_attributes = True
 
 
+class ShelterContact(BaseModel):
+    name: str
+    phone: Optional[str] = None
+    email: str
+    contact_hours: Optional[str] = None
+    
+    class Config:
+        from_attributes = True
+
+
+class PetWithContact(Pet):
+    shelter: ShelterContact
+
+
 class PetSummary(BaseModel):
     id: int
     name: str
@@ -107,6 +121,7 @@ class ShelterBase(BaseModel):
     name: str
     email: EmailStr
     phone: Optional[str] = None
+    contact_hours: Optional[str] = None
     website: Optional[str] = None
     address: Optional[str] = None
     city: str

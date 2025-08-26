@@ -78,6 +78,7 @@ class Shelter(Base):
     name = Column(String(200), nullable=False, index=True)
     email = Column(String(255), unique=True, index=True, nullable=False)
     phone = Column(String(20))
+    contact_hours = Column(String(100))
     website = Column(String(255))
     
     address = Column(String(255))

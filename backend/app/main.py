@@ -129,6 +129,16 @@ def get_pet(pet_id: int, db: Session = Depends(get_db)):
     except Exception as e:   
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/pets/{pet_id}/contact", response_model=schemas.PetWithContact)
+def get_pet_with_contact(pet_id: int, db: Session = Depends(get_db)):
+    """Get pet details with shelter contact information"""
+    try:
+        return services.PetService.get_pet_with_contact(db=db, pet_id=pet_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/pets", response_model=schemas.Pet)
 def create_pet(pet: schemas.PetCreate, db: Session = Depends(get_db)):
     """Create a new pet"""
@@ -227,6 +237,23 @@ def get_user_matches(user_id: int, limit: int = 20, db: Session = Depends(get_db
     except ValueError as e:  
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:   
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/shelters")
+def get_shelters(skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
+    """Get all shelters"""
+    try:
+        shelters = services.ShelterService.get_shelters(db=db, skip=skip, limit=limit)
+        return {"shelters": shelters}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/shelters", response_model=schemas.Shelter)
+def create_shelter(shelter: schemas.ShelterCreate, db: Session = Depends(get_db)):
+    """Create a new shelter"""
+    try:
+        return services.ShelterService.create_shelter(db=db, shelter_data=shelter)
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":

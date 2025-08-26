@@ -217,20 +217,41 @@ class PetService:
         return pet
     
     @staticmethod
-    def _validate_pet_data(age_years=None, adoption_fee=None):
-        """Shared validation logic for create and update"""
-        if age_years is not None and age_years < 0:
-            raise ValueError("Pet age cannot be negative")
+    def get_pet_with_contact(db: Session, pet_id: int) -> models.Pet:
+        """Get pet with shelter contact information"""
+        pet = crud.PetCRUD.get_pet_with_shelter(db, pet_id)
+        if not pet:
+            raise ValueError("Pet not found")
         
-        if adoption_fee is not None and adoption_fee < 0:
-            raise ValueError("Adoption fee cannot be negative")
+        return pet
+    
+    @staticmethod
+    def _validate_pet_data(age_years=None, adoption_fee=None, temperament=None):
+        """Shared validation logic for create and update"""
+        if age_years is not None:
+            if age_years < 0:
+                raise ValueError("Pet age cannot be negative")
+            if age_years > 30:
+                raise ValueError("Pet age seems unrealistic (maximum 30 years)")
+        
+        if adoption_fee is not None:
+            if adoption_fee < 0:
+                raise ValueError("Adoption fee cannot be negative")
+            if adoption_fee > 10000:
+                raise ValueError("Adoption fee seems unrealistic (maximum $10,000)")
+        
+        if temperament is not None:
+            if len(temperament.strip()) < 3:
+                raise ValueError("Temperament description must be at least 3 characters")
+            if len(temperament) > 1000:
+                raise ValueError("Temperament description too long (maximum 1000 characters)")
     
     @staticmethod
     def create_pet(db: Session, pet_data: schemas.PetCreate) -> models.Pet:
         """Create pet with business logic validation"""
         
  
-        PetService._validate_pet_data(pet_data.age_years, pet_data.adoption_fee)
+        PetService._validate_pet_data(pet_data.age_years, pet_data.adoption_fee, pet_data.temperament)
         
 
         return crud.PetCRUD.create_pet(db, pet_data)
@@ -243,7 +264,7 @@ class PetService:
         if not existing_pet:
             raise ValueError("Pet not found")
         
-        PetService._validate_pet_data(update_data.age_years, update_data.adoption_fee)
+        PetService._validate_pet_data(update_data.age_years, update_data.adoption_fee, update_data.temperament)
         
 
         updated_pet = crud.PetCRUD.update_pet(db, pet_id, update_data)
@@ -398,3 +419,16 @@ class MatchingService:
             "total": len(matches),
             "requires_preferences": False
         }
+
+class ShelterService:
+    """Business logic for shelter operations"""
+    
+    @staticmethod
+    def get_shelters(db: Session, skip: int = 0, limit: int = 20) -> List[models.Shelter]:
+        """Get shelters with business logic"""
+        return crud.ShelterCRUD.get_shelters(db, skip, limit)
+    
+    @staticmethod
+    def create_shelter(db: Session, shelter_data: schemas.ShelterCreate) -> models.Shelter:
+        """Create shelter with validation"""
+        return crud.ShelterCRUD.create_shelter(db, shelter_data)

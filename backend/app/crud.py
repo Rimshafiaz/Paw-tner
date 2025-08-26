@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 from typing import List, Optional
 from . import models, schemas
@@ -9,6 +9,13 @@ class PetCRUD:
     def get_pet(db: Session, pet_id: int) -> Optional[models.Pet]:
         """Get a single pet by ID"""
         return db.query(models.Pet).filter(models.Pet.id == pet_id).first()
+    
+    @staticmethod
+    def get_pet_with_shelter(db: Session, pet_id: int) -> Optional[models.Pet]:
+        """Get a pet with shelter information for contact purposes"""
+        return db.query(models.Pet).options(
+            joinedload(models.Pet.shelter)
+        ).filter(models.Pet.id == pet_id).first()
     
     @staticmethod
     def _apply_pet_filters(query, pet_type=None, size=None, adoption_status=None, shelter_id=None, 
