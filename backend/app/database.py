@@ -21,6 +21,10 @@ def get_db():
     finally:
         db.close()
 
-# Create all tables
 def create_tables():
+    Base.metadata.create_all(bind=engine)
+
+def recreate_tables():
+    """Drop all tables and recreate them"""
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
