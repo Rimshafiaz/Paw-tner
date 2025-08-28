@@ -380,6 +380,61 @@ def get_user_matches(user_id: int, limit: int = 20, db: Session = Depends(get_db
     except Exception as e:   
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/users/{user_id}/favorites/{pet_id}")
+def add_favorite(user_id: int, pet_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    try:
+        if current_user.id != user_id:
+            raise HTTPException(403, "You can only manage your own favorites")
+        
+        pet = crud.PetCRUD.get_pet(db, pet_id)
+        if not pet:
+            raise HTTPException(404, "Pet not found")
+        
+        favorite = crud.UserFavoriteCRUD.add_favorite(db, user_id, pet_id)
+        return {"message": "Pet added to favorites", "favorite_id": favorite.id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+@app.delete("/users/{user_id}/favorites/{pet_id}")
+def remove_favorite(user_id: int, pet_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    try:
+        if current_user.id != user_id:
+            raise HTTPException(403, "You can only manage your own favorites")
+        
+        success = crud.UserFavoriteCRUD.remove_favorite(db, user_id, pet_id)
+        if not success:
+            raise HTTPException(404, "Favorite not found")
+        
+        return {"message": "Pet removed from favorites"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+@app.get("/users/{user_id}/favorites")
+def get_user_favorites(user_id: int, skip: int = 0, limit: int = 20, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    try:
+        if current_user.id != user_id:
+            raise HTTPException(403, "You can only view your own favorites")
+        
+        favorites = crud.UserFavoriteCRUD.get_user_favorites(db, user_id, skip, limit)
+        total = crud.UserFavoriteCRUD.get_user_favorites_count(db, user_id)
+        
+        pet_summaries = [schemas.PetSummary.from_orm(pet) for pet in favorites]
+        
+        return {
+            "favorites": pet_summaries,
+            "total": total,
+            "page": skip // limit + 1,
+            "size": limit
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
 @app.get("/shelters")
 def get_shelters(skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
     """Get all shelters"""
