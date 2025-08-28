@@ -1,8 +1,7 @@
 from sqlalchemy.orm import Session
 from typing import Optional, List, Dict
-from . import models, schemas, crud
+from . import models, schemas, crud, auth
 import json
-import bcrypt
 
 class UserService:
 
@@ -17,11 +16,11 @@ class UserService:
         if existing_user:
             raise ValueError("User with this email already exists")
         
-        hashed_password = bcrypt.hashpw(user_data.password.encode('utf-8'), bcrypt.gensalt())
+        hashed_password = auth.hash_password(user_data.password)
         
         
         user_dict = user_data.dict()
-        user_dict["hashed_password"] = hashed_password.decode('utf-8')
+        user_dict["hashed_password"] = hashed_password
         del user_dict["password"]  
         
         db_user = models.User(**user_dict)
@@ -162,6 +161,31 @@ class UserService:
             missing_basic_fields=missing_basic,
             missing_extended_fields=missing_extended
         )
+    
+    @staticmethod
+    def authenticate_user(db: Session, email: str, password: str) -> Optional[models.User]:
+        
+        
+        user = crud.UserCRUD.get_user_by_email(db, email)
+        if not user:
+            return None
+            
+        if not auth.verify_password(password, user.hashed_password):
+            return None
+            
+        return user
+    
+    @staticmethod
+    def create_user_token(user: models.User) -> str:
+        
+        token_data = {
+            "user_id": user.id,
+            "email": user.email,
+            "user_type": "user",
+            "role": user.role.value if user.role else "adopter",
+            "sub": str(user.id)
+        }
+        return auth.create_access_token(token_data)
 
 class PetService:
     """Business logic for pet operations"""
@@ -428,7 +452,48 @@ class ShelterService:
         """Get shelters with business logic"""
         return crud.ShelterCRUD.get_shelters(db, skip, limit)
     
+    
     @staticmethod
-    def create_shelter(db: Session, shelter_data: schemas.ShelterCreate) -> models.Shelter:
-        """Create shelter with validation"""
-        return crud.ShelterCRUD.create_shelter(db, shelter_data)
+    def register_shelter(db: Session, shelter_data: schemas.ShelterRegister) -> models.Shelter:
+        existing_shelter = crud.ShelterCRUD.get_shelter_by_email(db, shelter_data.email)
+        if existing_shelter:
+            raise ValueError("Shelter with this email already exists")
+        
+        hashed_password = auth.hash_password(shelter_data.password)
+        
+        shelter_dict = shelter_data.dict()
+        shelter_dict["hashed_password"] = hashed_password
+        shelter_dict["is_verified"] = True
+        del shelter_dict["password"]
+        
+        db_shelter = models.Shelter(**shelter_dict)
+        db.add(db_shelter)
+        db.commit()
+        db.refresh(db_shelter)
+        
+        return db_shelter
+    
+    @staticmethod
+    def authenticate_shelter(db: Session, email: str, password: str) -> Optional[models.Shelter]:
+        """Authenticate shelter login"""
+        
+        shelter = crud.ShelterCRUD.get_shelter_by_email(db, email)
+        if not shelter:
+            return None
+            
+        if not auth.verify_password(password, shelter.hashed_password):
+            return None
+            
+        return shelter
+    
+    @staticmethod
+    def create_shelter_token(shelter: models.Shelter) -> str:
+        """Create JWT token for shelter"""
+        token_data = {
+            "user_id": shelter.id,
+            "email": shelter.email,
+            "user_type": "shelter",
+            "role": "shelter",
+            "sub": str(shelter.id)
+        }
+        return auth.create_access_token(token_data)

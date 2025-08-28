@@ -34,6 +34,11 @@ class HouseType(enum.Enum):
     HOUSE = "house"
     CONDO = "condo"
     FARM = "farm"
+
+class UserRole(enum.Enum):
+    ADOPTER = "adopter"
+    SHELTER = "shelter" 
+    ADMIN = "admin"
  
 class User(Base):
     __tablename__ = "users"
@@ -44,6 +49,7 @@ class User(Base):
     hashed_password = Column(String(255), nullable=False)
     full_name = Column(String(200), nullable=False)
     phone = Column(String(20))
+    role = Column(Enum(UserRole), default=UserRole.ADOPTER)
     
     preferred_pet_type = Column(Enum(PetType))
     preferred_age_min = Column(Integer)
@@ -77,6 +83,7 @@ class Shelter(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(200), nullable=False, index=True)
     email = Column(String(255), unique=True, index=True, nullable=False)
+    hashed_password = Column(String(255), nullable=False)
     phone = Column(String(20))
     contact_hours = Column(String(100))
     website = Column(String(255))
@@ -90,7 +97,7 @@ class Shelter(Base):
     capacity = Column(Integer)
     license_number = Column(String(100))
     
-    is_verified = Column(Boolean, default=False)
+    is_verified = Column(Boolean, default=True)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

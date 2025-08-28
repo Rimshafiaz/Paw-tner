@@ -1,9 +1,10 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from .database import get_db, engine, create_tables, recreate_tables
 from .models import User, Pet, Shelter, UserFavorite
 from . import schemas, crud, services
+from .auth import get_current_user
 from sqlalchemy import text
 from typing import Optional, List
 
@@ -140,9 +141,20 @@ def get_pet_with_contact(pet_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/pets", response_model=schemas.Pet)
-def create_pet(pet: schemas.PetCreate, db: Session = Depends(get_db)):
-    """Create a new pet"""
+def create_pet(pet: schemas.PetCreate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Create a new pet (shelter only)"""
     try:
+        user_role = None
+        if hasattr(current_user, 'role') and current_user.role:
+            user_role = current_user.role.value
+        elif hasattr(current_user, '__tablename__') and current_user.__tablename__ == "shelters":
+            user_role = "shelter"
+            
+        if user_role != "shelter":
+            raise HTTPException(403, "Only shelters can create pets")
+        
+        if hasattr(current_user, '__tablename__') and not current_user.is_active:
+            raise HTTPException(403, "Account suspended")
         
         return services.PetService.create_pet(db=db, pet_data=pet)
     except ValueError as e:  
@@ -151,9 +163,20 @@ def create_pet(pet: schemas.PetCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.put("/pets/{pet_id}", response_model=schemas.Pet)
-def update_pet(pet_id: int, pet_update: schemas.PetUpdate, db: Session = Depends(get_db)):
-    """Update an existing pet"""
+def update_pet(pet_id: int, pet_update: schemas.PetUpdate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Update an existing pet (shelter only)"""
     try:
+        user_role = None
+        if hasattr(current_user, 'role') and current_user.role:
+            user_role = current_user.role.value
+        elif hasattr(current_user, '__tablename__') and current_user.__tablename__ == "shelters":
+            user_role = "shelter"
+            
+        if user_role != "shelter":
+            raise HTTPException(403, "Only shelters can update pets")
+        
+        if hasattr(current_user, '__tablename__') and not current_user.is_active:
+            raise HTTPException(403, "Account suspended")
         
         return services.PetService.update_pet(db=db, pet_id=pet_id, update_data=pet_update)
     except ValueError as e:  
@@ -162,9 +185,20 @@ def update_pet(pet_id: int, pet_update: schemas.PetUpdate, db: Session = Depends
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/pets/{pet_id}")
-def delete_pet(pet_id: int, db: Session = Depends(get_db)):
-    """Delete a pet"""
+def delete_pet(pet_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Delete a pet (shelter only)"""
     try:
+        user_role = None
+        if hasattr(current_user, 'role') and current_user.role:
+            user_role = current_user.role.value
+        elif hasattr(current_user, '__tablename__') and current_user.__tablename__ == "shelters":
+            user_role = "shelter"
+            
+        if user_role != "shelter":
+            raise HTTPException(403, "Only shelters can delete pets")
+        
+        if hasattr(current_user, '__tablename__') and not current_user.is_active:
+            raise HTTPException(403, "Account suspended")
         
         return services.PetService.delete_pet(db=db, pet_id=pet_id)
     except ValueError as e: 
@@ -184,10 +218,41 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     except Exception as e:   
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/users/{user_id}", response_model=schemas.User)
-def get_user(user_id: int, db: Session = Depends(get_db)):
-    """Get user profile"""
+@app.post("/login", response_model=schemas.TokenResponse)
+def login(login_data: schemas.LoginRequest, db: Session = Depends(get_db)):
     try:
+        user = services.UserService.authenticate_user(
+            db=db, 
+            email=login_data.email, 
+            password=login_data.password
+        )
+        
+        if not user:
+            raise HTTPException(401, "Invalid email or password")
+        
+        access_token = services.UserService.create_user_token(user)
+        
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": user
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/users/{user_id}", response_model=schemas.User)
+def get_user(user_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Get user profile (own profile only)"""
+    try:
+        
+        if current_user.id != user_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only access your own profile"
+            )
         
         return services.UserService.get_user_by_id(db=db, user_id=user_id)
     except ValueError as e: 
@@ -200,10 +265,17 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 def update_user_preferences(
     user_id: int, 
     preferences: schemas.UserPreferencesUpdate, 
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
-    """Update user preferences (basic or extended)"""
+    """Update user preferences (own preferences only)"""
     try:
+        
+        if current_user.id != user_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only update your own preferences"
+            )
         
         return services.UserService.update_user_preferences(
             db=db, 
@@ -216,9 +288,15 @@ def update_user_preferences(
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/users/{user_id}/profile-completeness", response_model=schemas.UserProfileCompleteness)
-def get_user_profile_completeness(user_id: int, db: Session = Depends(get_db)):
-    """Get detailed profile completeness information"""
+def get_user_profile_completeness(user_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Get detailed profile completeness information (own profile only)"""
     try:
+        
+        if current_user.id != user_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only access your own profile completeness"
+            )
         
         return services.UserService.get_profile_completeness(db=db, user_id=user_id)
     except ValueError as e: 
@@ -227,9 +305,15 @@ def get_user_profile_completeness(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/users/{user_id}/matches")
-def get_user_matches(user_id: int, limit: int = 20, db: Session = Depends(get_db)):
-    """Get AI-matched pets for a user"""
+def get_user_matches(user_id: int, limit: int = 20, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    """Get AI-matched pets for a user (own matches only)"""
     try:
+        
+        if current_user.id != user_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only access your own matches"
+            )
         
         return services.MatchingService.get_user_matches_with_validation(
             db=db, user_id=user_id, limit=limit
@@ -248,11 +332,84 @@ def get_shelters(skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/shelters", response_model=schemas.Shelter)
-def create_shelter(shelter: schemas.ShelterCreate, db: Session = Depends(get_db)):
-    """Create a new shelter"""
+
+@app.post("/shelters/register", response_model=schemas.Shelter)
+def register_shelter(shelter: schemas.ShelterRegister, db: Session = Depends(get_db)):
     try:
-        return services.ShelterService.create_shelter(db=db, shelter_data=shelter)
+        return services.ShelterService.register_shelter(db=db, shelter_data=shelter)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.put("/admin/shelters/{shelter_id}/suspend")
+def suspend_shelter(shelter_id: int, current_user=Depends(get_current_user), db: Session = Depends(get_db)):
+    if not hasattr(current_user, 'role') or current_user.role.value != "admin":
+        raise HTTPException(403, "Admin access required")
+    
+    shelter = crud.ShelterCRUD.get_shelter(db, shelter_id)
+    if not shelter:
+        raise HTTPException(404, "Shelter not found")
+    
+    shelter.is_active = False
+    db.commit()
+    return {"message": "Shelter suspended"}
+
+@app.put("/admin/shelters/{shelter_id}/reactivate")
+def reactivate_shelter(shelter_id: int, current_user=Depends(get_current_user), db: Session = Depends(get_db)):
+    if not hasattr(current_user, 'role') or current_user.role.value != "admin":
+        raise HTTPException(403, "Admin access required")
+    
+    shelter = crud.ShelterCRUD.get_shelter(db, shelter_id)
+    if not shelter:
+        raise HTTPException(404, "Shelter not found")
+    
+    shelter.is_active = True
+    db.commit()
+    return {"message": "Shelter reactivated"}
+
+@app.post("/shelters/login", response_model=schemas.TokenResponse)
+def shelter_login(login_data: schemas.LoginRequest, db: Session = Depends(get_db)):
+    """Shelter login endpoint"""
+    try:
+        shelter = services.ShelterService.authenticate_shelter(
+            db=db,
+            email=login_data.email,
+            password=login_data.password
+        )
+        
+        if not shelter:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid email or password"
+            )
+        
+        access_token = services.ShelterService.create_shelter_token(shelter)
+        
+        # Convert shelter to user-like object for token response
+        shelter_as_user = {
+            "id": shelter.id,
+            "email": shelter.email,
+            "username": shelter.name,  
+            "full_name": shelter.name,
+            "phone": shelter.phone,
+            "role": "shelter",
+            "basic_preferences_complete": False,
+            "extended_preferences_complete": False,
+            "created_at": shelter.created_at,
+            "preferred_pet_type": None,
+            "activity_level": None,
+            "house_type": None
+        }
+        
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": shelter_as_user
+        }
+        
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

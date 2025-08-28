@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 from datetime import datetime
-from .models import PetSize, PetType, AdoptionStatus, ActivityLevel, HouseType
+from .models import PetSize, PetType, AdoptionStatus, ActivityLevel, HouseType, UserRole
 import enum
 
 
@@ -91,6 +91,26 @@ class PetWithContact(Pet):
     shelter: ShelterContact
 
 
+class LoginRequest(BaseModel):
+    """
+    📝 LOGIN REQUEST SCHEMA
+    
+    What this defines:
+    - email: The user's email address (required)
+    - password: The user's password (required)
+    
+    This is what the frontend sends when user tries to login:
+    {
+        "email": "john@email.com",
+        "password": "mypassword123"
+    }
+    """
+    email: EmailStr
+    password: str
+
+
+
+
 class PetSummary(BaseModel):
     id: int
     name: str
@@ -134,6 +154,9 @@ class ShelterBase(BaseModel):
 class ShelterCreate(ShelterBase):
     pass
 
+class ShelterRegister(ShelterBase):
+    password: str
+
 class Shelter(ShelterBase):
     id: int
     is_verified: bool = False
@@ -151,6 +174,7 @@ class UserCreate(BaseModel):
     password: str
     full_name: str
     phone: Optional[str] = None
+    role: Optional[UserRole] = UserRole.ADOPTER
 
 class UserLogin(BaseModel):
     email: EmailStr
@@ -205,6 +229,7 @@ class User(BaseModel):
     username: str
     full_name: str
     phone: Optional[str] = None
+    role: UserRole
     basic_preferences_complete: bool = False
     extended_preferences_complete: bool = False
     created_at: datetime
@@ -216,6 +241,32 @@ class User(BaseModel):
     
     class Config:
         from_attributes = True
+
+
+class TokenResponse(BaseModel):
+    """
+    🎫 TOKEN RESPONSE SCHEMA  
+    
+    What this defines:
+    - access_token: The JWT token string
+    - token_type: Always "bearer" (standard)
+    - user: Basic user info
+    
+    This is what we send back after successful login:
+    {
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+        "token_type": "bearer",
+        "user": {
+            "id": 123,
+            "email": "john@email.com",
+            "full_name": "John Doe"
+        }
+    }
+    """
+    access_token: str
+    token_type: str
+    user: User
+
 
 class UserProfileCompleteness(BaseModel):
     basic_complete: bool
