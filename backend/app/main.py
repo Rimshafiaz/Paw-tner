@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from .database import get_db, engine, create_tables, recreate_tables
 from .models import User, Pet, Shelter, UserFavorite
@@ -7,6 +8,9 @@ from . import schemas, crud, services
 from .auth import get_current_user
 from sqlalchemy import text
 from typing import Optional, List
+import os
+import uuid
+from pathlib import Path
 
 
 app = FastAPI(
@@ -22,6 +26,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 @app.get("/")
 def read_root():
@@ -204,6 +210,57 @@ def delete_pet(pet_id: int, db: Session = Depends(get_db), current_user=Depends(
     except ValueError as e: 
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:   
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/pets/{pet_id}/upload-photo")
+def upload_pet_photo(pet_id: int, file: UploadFile = File(...), db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    try:
+        user_role = None
+        if hasattr(current_user, 'role') and current_user.role:
+            user_role = current_user.role.value
+        elif hasattr(current_user, '__tablename__') and current_user.__tablename__ == "shelters":
+            user_role = "shelter"
+            
+        if user_role != "shelter":
+            raise HTTPException(403, "Only shelters can upload pet photos")
+        
+        if hasattr(current_user, '__tablename__') and not current_user.is_active:
+            raise HTTPException(403, "Account suspended")
+
+        pet = crud.PetCRUD.get_pet(db, pet_id)
+        if not pet:
+            raise HTTPException(404, "Pet not found")
+        
+        if not file.content_type.startswith('image/'):
+            raise HTTPException(400, "File must be an image")
+        
+        if file.size > 5 * 1024 * 1024:  # 5MB limit
+            raise HTTPException(400, "File too large (max 5MB)")
+        
+        file_extension = file.filename.split('.')[-1].lower()
+        if file_extension not in ['jpg', 'jpeg', 'png', 'gif']:
+            raise HTTPException(400, "Invalid file type. Use: jpg, jpeg, png, gif")
+        
+        unique_filename = f"{uuid.uuid4()}.{file_extension}"
+        file_path = Path("uploads/pets") / unique_filename
+        
+        with open(file_path, "wb") as buffer:
+            content = file.file.read()
+            buffer.write(content)
+        
+        photo_url = f"/uploads/pets/{unique_filename}"
+        pet.primary_photo_url = photo_url
+        db.commit()
+        
+        return {
+            "message": "Photo uploaded successfully",
+            "photo_url": photo_url,
+            "filename": unique_filename
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 # User Endpoints
