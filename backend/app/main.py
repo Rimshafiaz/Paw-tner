@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from .database import get_db, engine, create_tables, recreate_tables
 from .models import User, Pet, Shelter, UserFavorite
-from . import schemas, crud, services
+from . import schemas, crud, services, models
 from .auth import get_current_user
 from sqlalchemy import text
 from typing import Optional, List
@@ -443,6 +443,42 @@ def get_shelters(skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
         return {"shelters": shelters}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/shelters/{shelter_id}/stats")
+def get_shelter_stats(shelter_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    try:
+        user_role = None
+        if hasattr(current_user, 'role') and current_user.role:
+            user_role = current_user.role.value
+        elif hasattr(current_user, '__tablename__') and current_user.__tablename__ == "shelters":
+            user_role = "shelter"
+        
+        if user_role != "shelter" and user_role != "admin":
+            raise HTTPException(403, "Shelter or admin access required")
+        
+        if user_role == "shelter" and current_user.id != shelter_id:
+            raise HTTPException(403, "You can only view your own shelter stats")
+        
+        shelter = crud.ShelterCRUD.get_shelter(db, shelter_id)
+        if not shelter:
+            raise HTTPException(404, "Shelter not found")
+        
+        total_pets = db.query(Pet).filter(Pet.shelter_id == shelter_id).count()
+        available_pets = db.query(Pet).filter(Pet.shelter_id == shelter_id, Pet.adoption_status == models.AdoptionStatus.AVAILABLE).count()
+        adopted_pets = db.query(Pet).filter(Pet.shelter_id == shelter_id, Pet.adoption_status == models.AdoptionStatus.ADOPTED).count()
+        pending_pets = db.query(Pet).filter(Pet.shelter_id == shelter_id, Pet.adoption_status == models.AdoptionStatus.PENDING).count()
+        
+        return {
+            "shelter_name": shelter.name,
+            "total_pets": total_pets,
+            "available_pets": available_pets,
+            "adopted_pets": adopted_pets, 
+            "pending_pets": pending_pets
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, str(e))
 
 
 @app.post("/shelters/register", response_model=schemas.Shelter)
