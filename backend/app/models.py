@@ -72,6 +72,7 @@ class User(Base):
     city = Column(String(100))
     state = Column(String(50))
     zip_code = Column(String(10))
+    country = Column(String(100))
     
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

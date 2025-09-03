@@ -29,17 +29,18 @@ app.add_middleware(
 
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
-@app.get("/")
+@app.get("/", tags=["Root"])
 def read_root():
     return {"message": "Welcome to Paw-tner API!"}
 
 
 
-@app.get("/health")
+@app.get("/health", tags=["Health"])
 def health_check():
     return {"status": "healthy"}
 
-@app.get("/db-test")
+
+@app.get("/db-test", tags=["Database"])
 def test_database(db: Session = Depends(get_db)):
     try:
         # Test database connection
@@ -48,13 +49,15 @@ def test_database(db: Session = Depends(get_db)):
     except Exception as e:
         return {"message": "Database connection failed!", "error": str(e)}
 
-@app.post("/create-tables")
+@app.post("/create-tables", tags=["Database"])
 def create_database_tables():
     try:
         create_tables()
         return {"message": "Database tables created successfully!"}
     except Exception as e:
         return {"message": "Failed to create tables", "error": str(e)}
+    
+
 
 @app.post("/recreate-tables")
 def recreate_database_tables():
@@ -66,6 +69,7 @@ def recreate_database_tables():
 
 # Pet Endpoints
 @app.get("/pets", response_model=schemas.PetListResponse)
+
 def get_pets(
     skip: int = 0,
     limit: int = 20,

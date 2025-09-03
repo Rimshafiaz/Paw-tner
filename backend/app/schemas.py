@@ -174,6 +174,10 @@ class UserCreate(BaseModel):
     password: str
     full_name: str
     phone: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    zip_code: Optional[str] = None
+    country: Optional[str] = None
     role: Optional[UserRole] = UserRole.ADOPTER
 
 class UserLogin(BaseModel):
