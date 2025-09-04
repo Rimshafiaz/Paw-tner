@@ -13,8 +13,10 @@ class UserService:
         
         
         existing_user = crud.UserCRUD.get_user_by_email(db, user_data.email)
-        if existing_user:
-            raise ValueError("User with this email already exists")
+        existing_shelter = crud.ShelterCRUD.get_shelter_by_email(db, user_data.email)
+        
+        if existing_user or existing_shelter:
+            raise ValueError("Email already registered. Please use a different email address.")
         
         hashed_password = auth.hash_password(user_data.password)
         
@@ -455,9 +457,11 @@ class ShelterService:
     
     @staticmethod
     def register_shelter(db: Session, shelter_data: schemas.ShelterRegister) -> models.Shelter:
+        existing_user = crud.UserCRUD.get_user_by_email(db, shelter_data.email)
         existing_shelter = crud.ShelterCRUD.get_shelter_by_email(db, shelter_data.email)
-        if existing_shelter:
-            raise ValueError("Shelter with this email already exists")
+        
+        if existing_user or existing_shelter:
+            raise ValueError("Email already registered. Please use a different email address.")
         
         hashed_password = auth.hash_password(shelter_data.password)
         

@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import validator from 'validator'
+import { validateEmail } from '../utils/validation'
+import NotificationBanner from './NotificationBanner'
 
 function AdopterRegistrationForm() {
   const [formData, setFormData] = useState({
@@ -19,68 +20,6 @@ function AdopterRegistrationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [emailValidation, setEmailValidation] = useState({ isValid: true, message: '' })
 
-  const levenshteinDistance = (str1, str2) => {
-    const matrix = Array(str2.length + 1).fill(null).map(() => Array(str1.length + 1).fill(null))
-    
-    for (let i = 0; i <= str1.length; i++) {
-      matrix[0][i] = i
-    }
-    
-    for (let j = 0; j <= str2.length; j++) {
-      matrix[j][0] = j
-    }
-    
-    for (let j = 1; j <= str2.length; j++) {
-      for (let i = 1; i <= str1.length; i++) {
-        if (str1[i - 1] === str2[j - 1]) {
-          matrix[j][i] = matrix[j - 1][i - 1]
-        } else {
-          matrix[j][i] = Math.min(
-            matrix[j - 1][i - 1] + 1,
-            matrix[j][i - 1] + 1,
-            matrix[j - 1][i] + 1
-          )
-        }
-      }
-    }
-    
-    return matrix[str2.length][str1.length]
-  }
-
-  const validateEmail = (email) => {
-    if (!email) {
-      return { isValid: true, message: '' }
-    }
-
-    if (!validator.isEmail(email)) {
-      return { isValid: false, message: 'Please enter a valid email address' }
-    }
-
-    const commonDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'aol.com', 'icloud.com', 'protonmail.com']
-    const domain = email.split('@')[1]?.toLowerCase()
-    
-    if (domain && !commonDomains.includes(domain)) {
-      let bestMatch = null
-      let minDistance = Infinity
-      
-      commonDomains.forEach(commonDomain => {
-        const distance = levenshteinDistance(domain, commonDomain)
-        if (distance <= 2 && distance < minDistance) {
-          minDistance = distance
-          bestMatch = commonDomain
-        }
-      })
-      
-      if (bestMatch && minDistance <= 2) {
-        return { 
-          isValid: false, 
-          message: `Did you mean ${email.split('@')[0]}@${bestMatch}?` 
-        }
-      }
-    }
-
-    return { isValid: true, message: '' }
-  }
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -156,7 +95,7 @@ function AdopterRegistrationForm() {
       if (response.ok) {
         const result = await response.json()
         console.log('Registration successful:', result)
-        showNotification('Account created successfully! Redirecting to login...', 'success')
+        showNotification('Account created successfully!', 'success')
         setTimeout(() => {
           window.location.href = '/login'
         }, 2000)
@@ -179,30 +118,18 @@ function AdopterRegistrationForm() {
 
   return (
     <div className="max-w-lg mx-auto">
-      {notification.show && (
-        <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-50 p-4 rounded-xl shadow-lg border-l-4 max-w-md w-full mx-4 ${
-          notification.type === 'success' 
-            ? 'bg-green-50 border-green-400 text-green-800' 
-            : 'bg-red-50 border-red-400 text-red-800'
-        }`}>
-          <div className="flex justify-between items-center">
-            <span>{notification.message}</span>
-            <button 
-              onClick={() => setNotification({ message: '', type: '', show: false })}
-              className="ml-4 text-gray-500 hover:text-gray-700"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
+      <NotificationBanner 
+        notification={notification} 
+        onClose={() => setNotification({ message: '', type: '', show: false })}
+      />
       
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Create Your Adopter Account</h1>
-        <p className="text-gray-600">Find your new best friend today. It's quick and easy!</p>
-      </div>
+
       
       <div className="bg-white rounded-2xl shadow-lg p-8">
+              <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-primary mb-2">Create Your Adopter Account</h1>
+        <p className="text-gray-600">Your Paw-tner era starts now. Get ready for pure happiness.</p>
+      </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <input
@@ -332,7 +259,7 @@ function AdopterRegistrationForm() {
             className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-colors mt-4 ${
               isSubmitting 
                 ? 'bg-gray-400 cursor-not-allowed opacity-75' 
-                : 'bg-primary text-white hover:bg-primary/90'
+                : 'bg-primary text-white hover:bg-primary/80'
             }`}
           >
             {isSubmitting ? 'Creating Account...' : 'Register'}

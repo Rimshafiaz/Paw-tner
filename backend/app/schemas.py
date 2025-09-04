@@ -147,6 +147,7 @@ class ShelterBase(BaseModel):
     city: str
     state: str
     zip_code: str
+    country: Optional[str] = None
     description: Optional[str] = None
     capacity: Optional[int] = None
     license_number: Optional[str] = None

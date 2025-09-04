@@ -93,6 +93,7 @@ class Shelter(Base):
     city = Column(String(100), nullable=False)
     state = Column(String(50), nullable=False)
     zip_code = Column(String(10), nullable=False)
+    country = Column(String(100))
     
     description = Column(Text)
     capacity = Column(Integer)
