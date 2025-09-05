@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { validateEmail } from '../utils/validation'
-import NotificationBanner from './NotificationBanner'
+import { validateEmail } from '../../../utils/validation'
+import NotificationBanner from '../../../components/NotificationBanner'
 
 function ShelterRegistrationForm() {
   const [formData, setFormData] = useState({
@@ -90,21 +90,18 @@ function ShelterRegistrationForm() {
 
       if (response.ok) {
         const result = await response.json()
-        console.log('Registration successful:', result)
         showNotification('Shelter registered successfully!', 'success')
         setTimeout(() => {
           window.location.href = '/login'
         }, 2000)
       } else {
         const error = await response.json()
-        console.error('Registration error:', error)
         showNotification(error.detail || 'Registration failed. Please check your information and try again.', 'error')
       }
     } catch (error) {
       if (error.name === 'AbortError') {
         showNotification('Request timeout. Please check your connection and try again.', 'error')
       } else {
-        console.error('Network error:', error)
         showNotification('Connection failed. Please check your internet and try again.', 'error')
       }
     } finally {

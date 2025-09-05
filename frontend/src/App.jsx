@@ -2,9 +2,10 @@ import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom'
 import Home from './pages/Home'
 import About from './pages/About'
 import Register from './pages/register/Register'
+import Login from './pages/login/Login'
 import Navbar from './components/Navbar'
+import { AuthProvider, useAuth } from './contexts/AuthContext'
 
-// Layout component with navigation
 function Layout() {
   return (
     <div className="min-h-screen bg-background">
@@ -40,13 +41,39 @@ const router = createBrowserRouter([
       {
         path: "register/shelter", 
         element: <Register />
+      },
+      {
+        path: "login",
+        element: <Login />
       }
     ]
   }
 ])
 
-function App() {
+function AppContent() {
+  const { isLoading } = useAuth()
+  
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Checking if you're logged in...</p>
+        </div>
+      </div>
+    )
+  }
+  
   return <RouterProvider router={router} />
 }
 
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  )
+}
+
 export default App
+
