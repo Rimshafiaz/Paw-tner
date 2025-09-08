@@ -43,7 +43,6 @@ def health_check():
 @app.get("/db-test", tags=["Database"])
 def test_database(db: Session = Depends(get_db)):
     try:
-        # Test database connection
         result = db.execute(text("SELECT 1"))
         return {"message": "Database connection successful!", "result": result.scalar()}
     except Exception as e:
@@ -86,7 +85,6 @@ def get_pets(
     include_completeness: bool = False,
     db: Session = Depends(get_db)
 ):
-    """Get all pets with optional filtering and completeness info"""
     try:
         
         pet_summaries = services.PetService.get_pets_formatted_for_api(
@@ -151,8 +149,12 @@ def get_pet_with_contact(pet_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/pets", response_model=schemas.Pet)
-def create_pet(pet: schemas.PetCreate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    """Create a new pet (shelter only)"""
+def create_pet(
+    pet: schemas.PetCreate, 
+    override_duplicate: bool = False,
+    db: Session = Depends(get_db), 
+    current_user=Depends(get_current_user)
+):
     try:
         user_role = None
         if hasattr(current_user, 'role') and current_user.role:
@@ -166,7 +168,48 @@ def create_pet(pet: schemas.PetCreate, db: Session = Depends(get_db), current_us
         if hasattr(current_user, '__tablename__') and not current_user.is_active:
             raise HTTPException(403, "Account suspended")
         
+        if not override_duplicate:
+            pet_data_dict = {
+                'name': pet.name,
+                'breed': pet.breed,
+                'age_years': pet.age_years,
+                'age_months': pet.age_months,
+                'size': pet.size.value if pet.size else None,
+                'color': pet.color,
+                'gender': pet.gender
+            }
+            
+            duplicate_check = services.DuplicateDetectionService.check_for_duplicates(
+                db=db,
+                shelter_id=current_user.id,
+                new_pet_data=pet_data_dict
+            )
+            
+            if duplicate_check['limit_exceeded']:
+                raise HTTPException(
+                    status_code=403,
+                    detail={
+                        "type": "similarity_limit_exceeded",
+                        "message": f"Too many high-similarity pets. You already have {duplicate_check['high_similarity_count']} pets with 90%+ similarity. Limit: {duplicate_check['similarity_limit']}",
+                        "high_similarity_count": duplicate_check['high_similarity_count'],
+                        "similarity_limit": duplicate_check['similarity_limit'],
+                        "similar_pets": duplicate_check['similar_pets']
+                    }
+                )
+            elif duplicate_check['is_duplicate']:
+                raise HTTPException(
+                    status_code=409,
+                    detail={
+                        "type": "duplicate_warning",
+                        "message": f"Found {len(duplicate_check['similar_pets'])} similar pet(s)",
+                        "similar_pets": duplicate_check['similar_pets'],
+                        "max_similarity": duplicate_check['max_similarity'],
+                        "high_similarity_count": duplicate_check['high_similarity_count']
+                    }
+                )
+        
         return services.PetService.create_pet(db=db, pet_data=pet)
+        
     except ValueError as e:  
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:  
@@ -463,21 +506,40 @@ def get_shelter_stats(shelter_id: int, db: Session = Depends(get_db), current_us
         if user_role == "shelter" and current_user.id != shelter_id:
             raise HTTPException(403, "You can only view your own shelter stats")
         
-        shelter = crud.ShelterCRUD.get_shelter(db, shelter_id)
+        shelter = db.query(models.Shelter).filter(models.Shelter.id == shelter_id).first()
         if not shelter:
             raise HTTPException(404, "Shelter not found")
         
-        total_pets = db.query(Pet).filter(Pet.shelter_id == shelter_id).count()
-        available_pets = db.query(Pet).filter(Pet.shelter_id == shelter_id, Pet.adoption_status == models.AdoptionStatus.AVAILABLE).count()
-        adopted_pets = db.query(Pet).filter(Pet.shelter_id == shelter_id, Pet.adoption_status == models.AdoptionStatus.ADOPTED).count()
-        pending_pets = db.query(Pet).filter(Pet.shelter_id == shelter_id, Pet.adoption_status == models.AdoptionStatus.PENDING).count()
+        try:
+            total_pets = db.execute(text("SELECT COUNT(*) FROM pets WHERE shelter_id = :shelter_id"), {"shelter_id": shelter_id}).scalar() or 0
+            available_pets = db.execute(text("SELECT COUNT(*) FROM pets WHERE shelter_id = :shelter_id AND adoption_status = 'AVAILABLE'"), {"shelter_id": shelter_id}).scalar() or 0
+            adopted_pets = db.execute(text("SELECT COUNT(*) FROM pets WHERE shelter_id = :shelter_id AND adoption_status = 'ADOPTED'"), {"shelter_id": shelter_id}).scalar() or 0
+            pending_pets = db.execute(text("SELECT COUNT(*) FROM pets WHERE shelter_id = :shelter_id AND adoption_status = 'PENDING'"), {"shelter_id": shelter_id}).scalar() or 0
+        except Exception as e:
+            total_pets = available_pets = adopted_pets = pending_pets = 0
         
         return {
             "shelter_name": shelter.name,
             "total_pets": total_pets,
             "available_pets": available_pets,
             "adopted_pets": adopted_pets, 
-            "pending_pets": pending_pets
+            "pending_pets": pending_pets,
+            "profile": {
+                "id": shelter.id,
+                "name": shelter.name,
+                "email": shelter.email,
+                "phone": shelter.phone or "",
+                "city": shelter.city or "",
+                "state": shelter.state or "",
+                "country": shelter.country or "",
+                "address": shelter.address or "",
+                "zip_code": shelter.zip_code or "",
+                "description": shelter.description or "",
+                "capacity": shelter.capacity,
+                "contact_hours": shelter.contact_hours or "",
+                "website": shelter.website or "",
+                "license_number": shelter.license_number or ""
+            }
         }
     except HTTPException:
         raise
@@ -493,6 +555,120 @@ def register_shelter(shelter: schemas.ShelterRegister, db: Session = Depends(get
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/shelters/{shelter_id}/basic")
+def get_shelter_basic_info(shelter_id: int, db: Session = Depends(get_db)):
+    try:
+        shelter = db.query(models.Shelter).filter(models.Shelter.id == shelter_id).first()
+        
+        if not shelter:
+            raise HTTPException(404, "Shelter not found")
+        
+        # Return all needed info for profile form
+        return {
+            "id": shelter.id,
+            "name": shelter.name,
+            "email": shelter.email,
+            "phone": shelter.phone or "",
+            "city": shelter.city or "",
+            "state": shelter.state or "",
+            "country": shelter.country or "",
+            "address": shelter.address or "",
+            "zip_code": shelter.zip_code or "",
+            "description": shelter.description or "",
+            "capacity": shelter.capacity,
+            "contact_hours": shelter.contact_hours or "",
+            "website": shelter.website or "",
+            "license_number": shelter.license_number or ""
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+@app.put("/shelters/{shelter_id}/profile")
+def update_shelter_profile(shelter_id: int, shelter_update: dict, db: Session = Depends(get_db)):
+    try:
+        shelter = crud.ShelterCRUD.get_shelter(db, shelter_id)
+        if not shelter:
+            raise HTTPException(404, "Shelter not found")
+        
+        for field, value in shelter_update.items():
+            if hasattr(shelter, field) and field != 'id' and field != 'hashed_password':
+                setattr(shelter, field, value)
+        
+        db.commit()
+        db.refresh(shelter)
+        
+        return {
+            "id": shelter.id,
+            "name": shelter.name,
+            "email": shelter.email,
+            "phone": shelter.phone,
+            "city": shelter.city,
+            "state": shelter.state,
+            "country": shelter.country,
+            "address": shelter.address,
+            "zip_code": shelter.zip_code,
+            "description": shelter.description,
+            "capacity": shelter.capacity,
+            "contact_hours": shelter.contact_hours,
+            "website": shelter.website,
+            "license_number": shelter.license_number,
+            "message": "Profile updated successfully"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+@app.get("/shelters/{shelter_id}", response_model=schemas.Shelter)
+def get_shelter(shelter_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    try:
+        user_role = None
+        if hasattr(current_user, 'role') and current_user.role:
+            user_role = current_user.role.value
+        elif hasattr(current_user, '__tablename__') and current_user.__tablename__ == "shelters":
+            user_role = "shelter"
+        
+        if user_role == "shelter" and current_user.id != shelter_id:
+            raise HTTPException(403, "Can only access your own shelter profile")
+        elif user_role != "shelter" and user_role != "admin":
+            raise HTTPException(403, "Shelter or admin access required")
+            
+        shelter = crud.ShelterCRUD.get_shelter(db, shelter_id)
+        if not shelter:
+            raise HTTPException(404, "Shelter not found")
+        return shelter
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+@app.put("/shelters/{shelter_id}", response_model=schemas.Shelter)
+def update_shelter(shelter_id: int, shelter_update: schemas.ShelterBase, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    try:
+        user_role = None
+        if hasattr(current_user, 'role') and current_user.role:
+            user_role = current_user.role.value
+        elif hasattr(current_user, '__tablename__') and current_user.__tablename__ == "shelters":
+            user_role = "shelter"
+        
+        if user_role == "shelter" and current_user.id != shelter_id:
+            raise HTTPException(403, "Can only update your own shelter profile")
+        elif user_role != "shelter" and user_role != "admin":
+            raise HTTPException(403, "Shelter or admin access required")
+            
+        updated_shelter = crud.ShelterCRUD.update_shelter(db, shelter_id, shelter_update.model_dump(exclude_unset=True))
+        if not updated_shelter:
+            raise HTTPException(404, "Shelter not found")
+        return updated_shelter
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
 
 @app.put("/admin/shelters/{shelter_id}/suspend")
 def suspend_shelter(shelter_id: int, current_user=Depends(get_current_user), db: Session = Depends(get_db)):
@@ -538,7 +714,6 @@ def shelter_login(login_data: schemas.LoginRequest, db: Session = Depends(get_db
         
         access_token = services.ShelterService.create_shelter_token(shelter)
         
-        # Convert shelter to user-like object for token response
         shelter_as_user = {
             "id": shelter.id,
             "email": shelter.email,

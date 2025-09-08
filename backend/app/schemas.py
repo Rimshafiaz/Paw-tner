@@ -28,6 +28,7 @@ class PetBase(BaseModel):
     good_with_kids: Optional[bool] = False
     good_with_dogs: Optional[bool] = False
     good_with_cats: Optional[bool] = False
+    good_with_other_animals: Optional[bool] = False
     house_trained: Optional[bool] = False
     medical_history: Optional[str] = None
     special_needs: Optional[str] = None
@@ -56,6 +57,7 @@ class PetUpdate(BaseModel):
     good_with_kids: Optional[bool] = None
     good_with_dogs: Optional[bool] = None
     good_with_cats: Optional[bool] = None
+    good_with_other_animals: Optional[bool] = None
     house_trained: Optional[bool] = None
     medical_history: Optional[str] = None
     special_needs: Optional[str] = None
@@ -119,6 +121,7 @@ class PetSummary(BaseModel):
     age_years: Optional[int] = None
     size: PetSize
     adoption_status: AdoptionStatus
+    adoption_fee: float
     primary_photo_url: Optional[str] = None
     shelter_id: int
     
@@ -146,7 +149,7 @@ class ShelterBase(BaseModel):
     address: Optional[str] = None
     city: str
     state: str
-    zip_code: str
+    zip_code: Optional[str] = None
     country: Optional[str] = None
     description: Optional[str] = None
     capacity: Optional[int] = None

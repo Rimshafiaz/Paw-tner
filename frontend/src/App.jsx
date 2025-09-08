@@ -3,7 +3,15 @@ import Home from './pages/Home'
 import About from './pages/About'
 import Register from './pages/register/Register'
 import Login from './pages/login/Login'
+import AdopterDashboard from './pages/dashboard/AdopterDashboard'
+import ShelterDashboard from './pages/shelter/ShelterDashboard'
+import AddPet from './pages/shelter/AddPet'
+import ManagePets from './pages/shelter/ManagePets'
+import EditPet from './pages/shelter/EditPet'
+import ShelterProfile from './pages/shelter/ShelterProfile'
+import ViewPet from './pages/shelter/ViewPet'
 import Navbar from './components/Navbar'
+import ProtectedRoute from './components/ProtectedRoute'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 
 function Layout() {
@@ -45,6 +53,62 @@ const router = createBrowserRouter([
       {
         path: "login",
         element: <Login />
+      },
+      {
+        path: "dashboard",
+        element: (
+          <ProtectedRoute requiredRole="adopter">
+            <AdopterDashboard />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "shelter/dashboard", 
+        element: (
+          <ProtectedRoute requiredRole="shelter">
+            <ShelterDashboard />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "shelter/pets/add",
+        element: (
+          <ProtectedRoute requiredRole="shelter">
+            <AddPet />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "shelter/pets/manage",
+        element: (
+          <ProtectedRoute requiredRole="shelter">
+            <ManagePets />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "shelter/pets/edit/:petId",
+        element: (
+          <ProtectedRoute requiredRole="shelter">
+            <EditPet />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "shelter/pets/view/:petId",
+        element: (
+          <ProtectedRoute requiredRole="shelter">
+            <ViewPet />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "shelter/profile",
+        element: (
+          <ProtectedRoute requiredRole="shelter">
+            <ShelterProfile />
+          </ProtectedRoute>
+        )
       }
     ]
   }

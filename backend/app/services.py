@@ -5,11 +5,9 @@ import json
 
 class UserService:
 
-    """Business logic for user operations"""
     
     @staticmethod
     def create_user(db: Session, user_data: schemas.UserCreate) -> models.User:
-        """Create user with ALL business logic validation"""
         
         
         existing_user = crud.UserCRUD.get_user_by_email(db, user_data.email)
@@ -34,7 +32,6 @@ class UserService:
     
     @staticmethod
     def get_user_by_id(db: Session, user_id: int) -> models.User:
-        """Get user by ID with business logic validation"""
         user = crud.UserCRUD.get_user(db, user_id)
         if not user:
             raise ValueError("User not found")
@@ -49,7 +46,6 @@ class UserService:
         user_id: int, 
         preferences: schemas.UserPreferencesUpdate
     ) -> Optional[models.User]:
-        """Update user preferences with business logic"""
         
         update_data = {}
 
@@ -190,11 +186,9 @@ class UserService:
         return auth.create_access_token(token_data)
 
 class PetService:
-    """Business logic for pet operations"""
     
     @staticmethod
     def get_pets_with_completeness(db: Session, **filters) -> List[Dict]:
-        """Get pets with calculated profile completeness"""
         pets = crud.PetCRUD.get_pets(db, **filters)
         
         result = []
@@ -213,7 +207,6 @@ class PetService:
     
     @staticmethod
     def get_pets_formatted_for_api(db: Session, include_completeness: bool = False, **filters):
-        """Get pets formatted for API response (handles both simple and completeness modes)"""
         
         if include_completeness:
             pets_with_completeness = PetService.get_pets_with_completeness(db, **filters)
@@ -234,7 +227,6 @@ class PetService:
     
     @staticmethod
     def get_pet_by_id(db: Session, pet_id: int) -> models.Pet:
-        """Get pet by ID with business logic validation"""
         pet = crud.PetCRUD.get_pet(db, pet_id)
         if not pet:
             raise ValueError("Pet not found")
@@ -253,7 +245,6 @@ class PetService:
     
     @staticmethod
     def _validate_pet_data(age_years=None, adoption_fee=None, temperament=None):
-        """Shared validation logic for create and update"""
         if age_years is not None:
             if age_years < 0:
                 raise ValueError("Pet age cannot be negative")
@@ -274,7 +265,6 @@ class PetService:
     
     @staticmethod
     def create_pet(db: Session, pet_data: schemas.PetCreate) -> models.Pet:
-        """Create pet with business logic validation"""
         
  
         PetService._validate_pet_data(pet_data.age_years, pet_data.adoption_fee, pet_data.temperament)
@@ -284,7 +274,6 @@ class PetService:
     
     @staticmethod
     def update_pet(db: Session, pet_id: int, update_data: schemas.PetUpdate) -> models.Pet:
-        """Update pet with business logic validation"""
         
         existing_pet = crud.PetCRUD.get_pet(db, pet_id)
         if not existing_pet:
@@ -298,7 +287,6 @@ class PetService:
     
     @staticmethod
     def delete_pet(db: Session, pet_id: int) -> dict:
-        """Delete pet with business logic validation"""
         
         existing_pet = crud.PetCRUD.get_pet(db, pet_id)
         if not existing_pet:
@@ -351,7 +339,6 @@ class PetService:
             return schemas.ProfileCompleteness.MINIMAL
 
 class MatchingService:
-    """Business logic for AI pet matching"""
     
     @staticmethod
     def calculate_user_pet_compatibility(user: models.User, pet: models.Pet) -> float:
@@ -395,7 +382,6 @@ class MatchingService:
     
     @staticmethod
     def get_user_matches(db: Session, user_id: int, limit: int = 20) -> List[Dict]:
-        """Get AI-matched pets for a user"""
         
         user = crud.UserCRUD.get_user(db, user_id)
         if not user:
@@ -425,7 +411,6 @@ class MatchingService:
     
     @staticmethod
     def get_user_matches_with_validation(db: Session, user_id: int, limit: int):
-        """Get matches with full business logic validation"""
         
         user = crud.UserCRUD.get_user(db, user_id)
         if not user:
@@ -447,11 +432,9 @@ class MatchingService:
         }
 
 class ShelterService:
-    """Business logic for shelter operations"""
     
     @staticmethod
     def get_shelters(db: Session, skip: int = 0, limit: int = 20) -> List[models.Shelter]:
-        """Get shelters with business logic"""
         return crud.ShelterCRUD.get_shelters(db, skip, limit)
     
     
@@ -492,7 +475,6 @@ class ShelterService:
     
     @staticmethod
     def create_shelter_token(shelter: models.Shelter) -> str:
-        """Create JWT token for shelter"""
         token_data = {
             "user_id": shelter.id,
             "email": shelter.email,
@@ -501,3 +483,136 @@ class ShelterService:
             "sub": str(shelter.id)
         }
         return auth.create_access_token(token_data)
+
+
+class DuplicateDetectionService:
+    """Service to detect potential duplicate pet listings"""
+    
+    @staticmethod
+    def calculate_pet_similarity(pet1: dict, pet2: dict) -> float:
+        """Calculate similarity score between two pets (0-100%)"""
+        similarity_score = 0.0
+        total_weight = 0.0
+        
+        
+        name_weight = 30.0
+        if pet1.get('name', '').lower() == pet2.get('name', '').lower():
+            similarity_score += name_weight
+        elif DuplicateDetectionService._fuzzy_match(pet1.get('name', ''), pet2.get('name', '')):
+            similarity_score += name_weight * 0.7
+        total_weight += name_weight
+        
+        
+        breed_weight = 25.0
+        if pet1.get('breed', '').lower() == pet2.get('breed', '').lower():
+            similarity_score += breed_weight
+        elif DuplicateDetectionService._fuzzy_match(pet1.get('breed', ''), pet2.get('breed', '')):
+            similarity_score += breed_weight * 0.6
+        total_weight += breed_weight
+        
+       
+        age_weight = 20.0
+        age1_months = (pet1.get('age_years', 0) * 12) + pet1.get('age_months', 0)
+        age2_months = (pet2.get('age_years', 0) * 12) + pet2.get('age_months', 0)
+        age_diff = abs(age1_months - age2_months)
+        if age_diff <= 6:
+            similarity_score += age_weight * (1 - age_diff / 12)
+        total_weight += age_weight
+        
+        
+        size_weight = 10.0
+        if pet1.get('size') == pet2.get('size'):
+            similarity_score += size_weight
+        total_weight += size_weight
+        
+        
+        color_weight = 10.0
+        if pet1.get('color', '').lower() == pet2.get('color', '').lower():
+            similarity_score += color_weight
+        elif DuplicateDetectionService._fuzzy_match(pet1.get('color', ''), pet2.get('color', '')):
+            similarity_score += color_weight * 0.5
+        total_weight += color_weight
+        
+        
+        gender_weight = 5.0
+        if pet1.get('gender', '').lower() == pet2.get('gender', '').lower():
+            similarity_score += gender_weight
+        total_weight += gender_weight
+        
+        return (similarity_score / total_weight) * 100 if total_weight > 0 else 0.0
+    
+    @staticmethod
+    def _fuzzy_match(str1: str, str2: str, threshold: float = 0.8) -> bool:
+        """Simple fuzzy string matching"""
+        if not str1 or not str2:
+            return False
+        
+        str1, str2 = str1.lower().strip(), str2.lower().strip()
+        if len(str1) == 0 or len(str2) == 0:
+            return False
+
+        shorter, longer = (str1, str2) if len(str1) <= len(str2) else (str2, str1)
+
+        if shorter in longer:
+            return True
+        
+        
+        common_chars = set(shorter) & set(longer)
+        similarity = len(common_chars) / max(len(set(shorter)), len(set(longer)))
+        
+        return similarity >= threshold
+    
+    @staticmethod
+    def check_for_duplicates(db: Session, shelter_id: int, new_pet_data: dict, threshold: float = 85.0) -> dict:
+        """
+        Check if new pet is similar to existing pets from same shelter
+        Returns: {"is_duplicate": bool, "similar_pets": list, "max_similarity": float, "high_similarity_count": int, "limit_exceeded": bool}
+        """
+        existing_pets = crud.PetCRUD.get_pets_by_shelter(
+            db=db, 
+            shelter_id=shelter_id,
+            adoption_status="available"
+        )
+        
+        similar_pets = []
+        max_similarity = 0.0
+        high_similarity_count = 0
+        
+        for existing_pet in existing_pets:
+            existing_pet_dict = {
+                'name': existing_pet.name,
+                'breed': existing_pet.breed,
+                'age_years': existing_pet.age_years,
+                'age_months': existing_pet.age_months,
+                'size': existing_pet.size.value if existing_pet.size else None,
+                'color': existing_pet.color,
+                'gender': existing_pet.gender
+            }
+            
+            similarity = DuplicateDetectionService.calculate_pet_similarity(new_pet_data, existing_pet_dict)
+            
+            if similarity >= threshold:
+                similar_pets.append({
+                    'pet_id': existing_pet.id,
+                    'name': existing_pet.name,
+                    'breed': existing_pet.breed,
+                    'age_display': f"{existing_pet.age_years} years, {existing_pet.age_months or 0} months",
+                    'similarity_score': round(similarity, 1)
+                })
+                
+                if similarity >= 90.0:
+                    high_similarity_count += 1
+                    
+            max_similarity = max(max_similarity, similarity)
+        
+        HIGH_SIMILARITY_LIMIT = 3
+        limit_exceeded = high_similarity_count >= HIGH_SIMILARITY_LIMIT and max_similarity >= 90.0
+        
+        return {
+            'is_duplicate': len(similar_pets) > 0,
+            'similar_pets': similar_pets,
+            'max_similarity': round(max_similarity, 1),
+            'high_similarity_count': high_similarity_count,
+            'limit_exceeded': limit_exceeded,
+            'similarity_limit': HIGH_SIMILARITY_LIMIT
+        }

@@ -1,23 +1,21 @@
-import ProtectedRoute from '../../components/ProtectedRoute'
 import { useAuth } from '../../contexts/AuthContext'
 
 function AdopterDashboard() {
-  const { user } = useAuth()
+  const { currentUser } = useAuth()
 
   return (
-    <ProtectedRoute requireRole="adopter">
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Welcome back, {user?.full_name}! ❤️
-            </h1>
-            <p className="text-gray-600 mt-2">
-              Ready to find your perfect companion? Let's explore available pets.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Welcome back, {currentUser?.name}! ❤️
+          </h1>
+          <p className="text-gray-600 mt-2">
+            Ready to find your perfect companion? Let's explore available pets.
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-white p-6 rounded-lg shadow-sm">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Browse Pets</h3>
               <p className="text-gray-600 text-sm mb-4">
@@ -50,7 +48,6 @@ function AdopterDashboard() {
           </div>
         </div>
       </div>
-    </ProtectedRoute>
   )
 }
 

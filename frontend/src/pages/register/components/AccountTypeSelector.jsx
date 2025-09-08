@@ -2,7 +2,7 @@ function AccountTypeSelector({ onSelect }) {
   return (
     <>
       <div className="text-center mb-12">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Join Our Community</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-tertiary mb-4">Join Our Community</h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">Choose how you'd like to get started with Paw-tner.</p>
       </div>
 
@@ -18,7 +18,7 @@ function AccountTypeSelector({ onSelect }) {
             <p className="text-gray-600 mb-8 leading-relaxed">
               Find your perfect furry, scaly, or feathered companion. Browse profiles, connect with shelters, and start your adoption journey.
             </p>
-            <button className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary/90 transition-colors">
+            <button className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold hover:bg-primary/80 transition-colors">
               Sign Up as Adopter
             </button>
           </div>
@@ -34,7 +34,7 @@ function AccountTypeSelector({ onSelect }) {
             <p className="text-gray-600 mb-8 leading-relaxed">
               Connect with potential adopters and find loving homes for your animals. Manage pet profiles and streamline your adoption process.
             </p>
-            <button className="w-full bg-secondary text-white py-3 px-6 rounded-lg font-semibold hover:bg-secondary/90 transition-colors">
+            <button className="w-full bg-secondary text-white py-3 px-6 rounded-lg font-semibold hover:bg-secondary/80 transition-colors">
               Sign Up as Shelter
             </button>
           </div>

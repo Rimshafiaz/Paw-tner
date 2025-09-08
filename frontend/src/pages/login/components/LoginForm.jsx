@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { validateEmail } from '../../../utils/validation'
 import NotificationBanner from '../../../components/NotificationBanner'
 import RoleSelector from './RoleSelector'
@@ -16,6 +17,7 @@ function LoginForm() {
   const [emailValidation, setEmailValidation] = useState({ isValid: true, message: '' })
   
   const { login } = useAuth()
+  const navigate = useNavigate()
   
   
 
@@ -86,6 +88,15 @@ function LoginForm() {
         
         showNotification('Login successful!', 'success')
         
+        
+        setTimeout(() => {
+          if (formData.userType === 'shelter') {
+            navigate('/shelter/dashboard')
+          } else {
+            navigate('/dashboard')
+          }
+        }, 1000)
+        
       } else {
         const error = await response.json()
         showNotification(error.detail || 'Invalid email or password. Please try again.', 'error')
@@ -110,7 +121,7 @@ function LoginForm() {
       
       <div className="bg-white rounded-2xl shadow-lg p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h1>
+          <h1 className="text-3xl font-bold text-tertiary mb-2">Welcome Back</h1>
           <p className="text-gray-600">Sign in to your Paw-tner account</p>
         </div>
 
@@ -157,17 +168,17 @@ function LoginForm() {
             className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-colors ${
               isSubmitting 
                 ? 'bg-gray-400 cursor-not-allowed opacity-75' 
-                : 'bg-primary text-white hover:bg-primary/90'
+                : formData.userType === 'adopter' ? 'bg-primary text-white hover:bg-primary/80' : 'bg-secondary text-white hover:bg-secondary/80'
             }`}
           >
-            {isSubmitting ? 'Signing In...' : 'Sign In'}
+            {isSubmitting ? 'Signing In' : 'Sign In'}
           </button>
         </form>
         
         <div className="text-center mt-6">
           <p className="text-gray-600">
             Don't have an account?{' '}
-            <a href="/register" className="text-secondary font-medium hover:underline">
+            <a href="/register" className="text-blue-400 font-medium hover:underline">
               Sign up
             </a>
           </p>

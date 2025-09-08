@@ -92,7 +92,7 @@ class Shelter(Base):
     address = Column(String(255))
     city = Column(String(100), nullable=False)
     state = Column(String(50), nullable=False)
-    zip_code = Column(String(10), nullable=False)
+    zip_code = Column(String(10))
     country = Column(String(100))
     
     description = Column(Text)
@@ -127,6 +127,7 @@ class Pet(Base):
     good_with_kids = Column(Boolean, default=False)
     good_with_dogs = Column(Boolean, default=False)
     good_with_cats = Column(Boolean, default=False)
+    good_with_other_animals = Column(Boolean, default=False)
     house_trained = Column(Boolean, default=False)
     
     medical_history = Column(Text)

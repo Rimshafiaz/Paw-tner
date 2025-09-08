@@ -7,7 +7,6 @@ class PetCRUD:
     
     @staticmethod
     def get_pet(db: Session, pet_id: int) -> Optional[models.Pet]:
-        """Get a single pet by ID"""
         return db.query(models.Pet).filter(models.Pet.id == pet_id).first()
     
     @staticmethod
@@ -20,7 +19,6 @@ class PetCRUD:
     @staticmethod
     def _apply_pet_filters(query, pet_type=None, size=None, adoption_status=None, shelter_id=None, 
                           gender=None, age_min=None, age_max=None, city=None, state=None, breed=None):
-        """Apply common filtering logic to pet queries"""
         if pet_type:
             query = query.filter(models.Pet.pet_type == pet_type)
         if size:
@@ -86,11 +84,22 @@ class PetCRUD:
         state: Optional[str] = None,
         breed: Optional[str] = None
     ) -> int:
-        """Get total count of pets with filters"""
         query = db.query(func.count(models.Pet.id))
         query = PetCRUD._apply_pet_filters(query, pet_type, size, adoption_status, shelter_id,
                                           gender, age_min, age_max, city, state, breed)
         return query.scalar()
+    
+    @staticmethod
+    def get_pets_by_shelter(db: Session, shelter_id: int, adoption_status: Optional[str] = None) -> List[models.Pet]:
+        query = db.query(models.Pet).filter(models.Pet.shelter_id == shelter_id)
+        if adoption_status:
+            if adoption_status == "available":
+                query = query.filter(models.Pet.adoption_status == models.AdoptionStatus.AVAILABLE)
+            elif adoption_status == "adopted":
+                query = query.filter(models.Pet.adoption_status == models.AdoptionStatus.ADOPTED)
+            elif adoption_status == "pending":
+                query = query.filter(models.Pet.adoption_status == models.AdoptionStatus.PENDING)
+        return query.all()
     
     @staticmethod
     def create_pet(db: Session, pet: schemas.PetCreate) -> models.Pet:
@@ -133,7 +142,6 @@ class ShelterCRUD:
     
     @staticmethod
     def get_shelter(db: Session, shelter_id: int) -> Optional[models.Shelter]:
-        """Get a single shelter by ID"""
         return db.query(models.Shelter).filter(models.Shelter.id == shelter_id).first()
     
     @staticmethod
@@ -176,7 +184,6 @@ class UserCRUD:
     
     @staticmethod
     def get_user(db: Session, user_id: int) -> Optional[models.User]:
-        """Get a single user by ID"""
         return db.query(models.User).filter(models.User.id == user_id).first()
     
     @staticmethod
@@ -224,7 +231,6 @@ class UserFavoriteCRUD:
     @staticmethod
     def add_favorite(db: Session, user_id: int, pet_id: int) -> Optional[models.UserFavorite]:
         """Add a pet to user's favorites"""
-        # Check if already favorited
         existing = db.query(models.UserFavorite).filter(
             models.UserFavorite.user_id == user_id,
             models.UserFavorite.pet_id == pet_id
