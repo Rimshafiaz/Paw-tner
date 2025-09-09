@@ -9,7 +9,7 @@ function ShelterRegistrationForm() {
     phone: '',
     password: '',
     confirm_password: '',
-    country: '',
+    country: 'Pakistan',
     city: '',
     state: '',
     zip_code: ''
@@ -173,8 +173,9 @@ function ShelterRegistrationForm() {
               name="country"
               value={formData.country}
               onChange={handleChange}
-              placeholder="Country"
+              placeholder="Pakistan"
               className="w-full px-4 py-4 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:bg-white transition-colors"
+              readOnly
               required
             />
           </div>
@@ -192,15 +193,22 @@ function ShelterRegistrationForm() {
               />
             </div>
             <div>
-              <input
-                type="text"
+              <select
                 name="state"
                 value={formData.state}
                 onChange={handleChange}
-                placeholder="State"
                 className="w-full px-4 py-4 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:bg-white transition-colors"
                 required
-              />
+              >
+                <option value="">Select Province</option>
+                <option value="Punjab">Punjab</option>
+                <option value="Sindh">Sindh</option>
+                <option value="Khyber Pakhtunkhwa">Khyber Pakhtunkhwa</option>
+                <option value="Balochistan">Balochistan</option>
+                <option value="Gilgit-Baltistan">Gilgit-Baltistan</option>
+                <option value="Azad Kashmir">Azad Kashmir</option>
+                <option value="Islamabad Capital Territory">Islamabad Capital Territory</option>
+              </select>
             </div>
             <div>
               <input
@@ -208,7 +216,7 @@ function ShelterRegistrationForm() {
                 name="zip_code"
                 value={formData.zip_code}
                 onChange={handleChange}
-                placeholder="Zip"
+                placeholder="Postal Code"
                 className="w-full px-4 py-4 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:bg-white transition-colors"
                 required
               />

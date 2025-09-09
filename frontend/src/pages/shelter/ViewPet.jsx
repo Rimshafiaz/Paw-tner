@@ -94,7 +94,7 @@ function ViewPet() {
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <div className="flex items-start justify-between mb-6">
             <div>
-              <h1 className="text-3xl font-bold text-secondary mb-2">{pet.name}</h1>
+              <h1 className="text-3xl font-bold from-[#4ECDC4] to-[#2DD4BF] text-transparent bg-clip-text bg-gradient-to-br mb-2">{pet.name}</h1>
               <div className="flex items-center space-x-4">
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                   pet.adoption_status === 'AVAILABLE' ? 'bg-green-100 text-green-800' :

@@ -214,6 +214,7 @@ class UserCRUD:
         db.refresh(db_user)
         return db_user
     
+    
     @staticmethod
     def delete_user(db: Session, user_id: int) -> bool:
         """Delete a user"""

@@ -84,6 +84,11 @@ class ShelterContact(BaseModel):
     phone: Optional[str] = None
     email: str
     contact_hours: Optional[str] = None
+    address: Optional[str] = None
+    city: str
+    state: str
+    zip_code: Optional[str] = None
+    country: Optional[str] = None
     
     class Config:
         from_attributes = True
@@ -94,19 +99,7 @@ class PetWithContact(Pet):
 
 
 class LoginRequest(BaseModel):
-    """
-    📝 LOGIN REQUEST SCHEMA
     
-    What this defines:
-    - email: The user's email address (required)
-    - password: The user's password (required)
-    
-    This is what the frontend sends when user tries to login:
-    {
-        "email": "john@email.com",
-        "password": "mypassword123"
-    }
-    """
     email: EmailStr
     password: str
 
@@ -242,35 +235,31 @@ class User(BaseModel):
     extended_preferences_complete: bool = False
     created_at: datetime
     
-    # Include preferences if they exist
+    # Include all preferences if they exist
     preferred_pet_type: Optional[PetType] = None
+    preferred_age_min: Optional[int] = None
+    preferred_age_max: Optional[int] = None
     activity_level: Optional[ActivityLevel] = None
+    has_children: Optional[bool] = None
+    preferred_breeds: Optional[str] = None
     house_type: Optional[HouseType] = None
+    has_yard: Optional[bool] = None
+    experience_level: Optional[str] = None
+    has_other_pets: Optional[bool] = None
+    preferred_pet_size: Optional[PetSize] = None
+    max_adoption_fee: Optional[float] = None
+    preferred_temperament: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    zip_code: Optional[str] = None
+    country: Optional[str] = None
     
     class Config:
         from_attributes = True
 
 
 class TokenResponse(BaseModel):
-    """
-    🎫 TOKEN RESPONSE SCHEMA  
     
-    What this defines:
-    - access_token: The JWT token string
-    - token_type: Always "bearer" (standard)
-    - user: Basic user info
-    
-    This is what we send back after successful login:
-    {
-        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-        "token_type": "bearer",
-        "user": {
-            "id": 123,
-            "email": "john@email.com",
-            "full_name": "John Doe"
-        }
-    }
-    """
     access_token: str
     token_type: str
     user: User

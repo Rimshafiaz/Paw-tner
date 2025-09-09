@@ -102,7 +102,7 @@ function ShelterProfile() {
     }
     
     if (!formData.city.trim()) newErrors.city = 'City is required'
-    if (!formData.state.trim()) newErrors.state = 'State is required'
+    if (!formData.state.trim()) newErrors.state = 'Province is required'
     if (!formData.contact_hours.trim()) newErrors.contact_hours = 'Contact hours are required'
 
     setErrors(newErrors)
@@ -189,7 +189,7 @@ function ShelterProfile() {
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-secondary">Shelter Profile</h1>
+            <h1 className="text-3xl font-bold from-[#4ECDC4] to-[#2DD4BF] text-transparent bg-clip-text bg-gradient-to-br">Shelter Profile</h1>
             <p className="text-gray-600 mt-2">
               Complete your shelter profile to start listing pets for adoption
             </p>
@@ -347,25 +347,32 @@ function ShelterProfile() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    State *
+                    Province *
                   </label>
-                  <input
-                    type="text"
+                  <select
                     name="state"
                     value={formData.state}
                     onChange={handleChange}
                     className={`w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:bg-white transition-colors ${
                       errors.state ? 'focus:ring-red-500 ring-2 ring-red-500' : 'focus:ring-secondary'
                     }`}
-                    placeholder="State name"
                     required
-                  />
+                  >
+                    <option value="">Select Province</option>
+                    <option value="Punjab">Punjab</option>
+                    <option value="Sindh">Sindh</option>
+                    <option value="Khyber Pakhtunkhwa">Khyber Pakhtunkhwa</option>
+                    <option value="Balochistan">Balochistan</option>
+                    <option value="Gilgit-Baltistan">Gilgit-Baltistan</option>
+                    <option value="Azad Kashmir">Azad Kashmir</option>
+                    <option value="Islamabad Capital Territory">Islamabad Capital Territory</option>
+                  </select>
                   {errors.state && <p className="text-red-500 text-sm mt-1">{errors.state}</p>}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Zip Code
+                    Postal Code
                   </label>
                   <input
                     type="text"
@@ -373,7 +380,7 @@ function ShelterProfile() {
                     value={formData.zip_code}
                     onChange={handleChange}
                     className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:bg-white transition-colors"
-                    placeholder="12345"
+                    placeholder="54000"
                   />
                 </div>
 

@@ -72,3 +72,15 @@ yarn-error.log*
 # Build outputs
 frontend/build/
 frontend/coverage/
+
+# Backup and restore files (if created in future)
+backend/*_backup.json
+*_backup.py
+
+# Uploaded files (user content)
+backend/uploads/
+uploads/
+
+# Development databases (SQLite)
+*.db
+*.sqlite3

@@ -123,7 +123,7 @@ function ManagePets() {
         <div className="mb-8">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-secondary">Manage Pets</h1>
+              <h1 className="text-3xl font-bold from-[#4ECDC4] to-[#2DD4BF] text-transparent bg-clip-text bg-gradient-to-br">Manage Pets</h1>
               <p className="text-gray-600 mt-2">View and manage all your pet listings</p>
             </div>
             <button

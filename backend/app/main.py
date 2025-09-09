@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File
+from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
@@ -8,6 +8,8 @@ from . import schemas, crud, services, models
 from .auth import get_current_user
 from sqlalchemy import text
 from typing import Optional, List
+from pydantic import ValidationError
+from fastapi.responses import JSONResponse
 import os
 import uuid
 from pathlib import Path
@@ -15,7 +17,7 @@ from pathlib import Path
 
 app = FastAPI(
     title="Paw-tner API",
-    description="AI-driven pet matching platform API",
+    description="Pet matching platform API",
     version="1.0.0"
 )
 
@@ -26,6 +28,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.exception_handler(ValidationError)
+async def validation_exception_handler(request: Request, exc: ValidationError):
+    print(f"Validation error: {exc}")
+    print(f"Validation error details: {exc.errors()}")
+    return JSONResponse(
+        status_code=422,
+        content={"detail": exc.errors()}
+    )
 
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
@@ -58,13 +69,36 @@ def create_database_tables():
     
 
 
+@app.post("/migrate-database")
+def migrate_database():
+    """Apply pending database migrations safely"""
+    try:
+        import subprocess
+        import os
+        
+        # Run alembic upgrade
+        result = subprocess.run(
+            ["alembic", "upgrade", "head"], 
+            cwd=os.path.dirname(__file__).replace("app", ""),
+            capture_output=True, 
+            text=True
+        )
+        
+        if result.returncode == 0:
+            return {"message": "Database migrations applied successfully!", "output": result.stdout}
+        else:
+            return {"message": "Migration failed", "error": result.stderr}
+    except Exception as e:
+        return {"message": "Failed to run migrations", "error": str(e)}
+
 @app.post("/recreate-tables")
 def recreate_database_tables():
-    try:
-        recreate_tables()
-        return {"message": "Database tables recreated successfully!"}
-    except Exception as e:
-        return {"message": "Failed to recreate tables", "error": str(e)}
+    """DEPRECATED: Use /migrate-database instead. This method WILL DELETE ALL DATA!"""
+    return {
+        "message": "This endpoint is deprecated and dangerous!", 
+        "error": "Use /migrate-database instead to preserve your data",
+        "warning": "This endpoint would delete all your data - migration is the safe way!"
+    }
 
 # Pet Endpoints
 @app.get("/pets", response_model=schemas.PetListResponse)
@@ -365,6 +399,26 @@ def get_user(user_id: int, db: Session = Depends(get_db), current_user=Depends(g
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/users/{user_id}/preferences", response_model=schemas.User)
+def get_user_preferences(
+    user_id: int, 
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    """Get user preferences (own preferences only)"""
+    try:
+        if current_user.id != user_id:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You can only access your own preferences"
+            )
+        
+        return services.UserService.get_user_by_id(db=db, user_id=user_id)
+    except ValueError as e: 
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:   
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.put("/users/{user_id}/preferences", response_model=schemas.User)
 def update_user_preferences(
     user_id: int, 
@@ -390,6 +444,9 @@ def update_user_preferences(
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:  
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+
 
 @app.get("/users/{user_id}/profile-completeness", response_model=schemas.UserProfileCompleteness)
 def get_user_profile_completeness(user_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
@@ -410,8 +467,9 @@ def get_user_profile_completeness(user_id: int, db: Session = Depends(get_db), c
 
 @app.get("/users/{user_id}/matches")
 def get_user_matches(user_id: int, limit: int = 20, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    """Get AI-matched pets for a user (own matches only)"""
+    """Get matched pets for a user (own matches only)"""
     try:
+        print(f"DEBUG: get_user_matches called for user_id={user_id}, limit={limit}")
         
         if current_user.id != user_id:
             raise HTTPException(
@@ -419,9 +477,11 @@ def get_user_matches(user_id: int, limit: int = 20, db: Session = Depends(get_db
                 detail="You can only access your own matches"
             )
         
-        return services.MatchingService.get_user_matches_with_validation(
+        result = services.MatchingService.get_user_matches_with_validation(
             db=db, user_id=user_id, limit=limit
         )
+        print(f"DEBUG: get_user_matches returning: {type(result)} with keys: {result.keys() if isinstance(result, dict) else 'N/A'}")
+        return result
     except ValueError as e:  
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:   

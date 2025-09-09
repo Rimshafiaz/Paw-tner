@@ -8,7 +8,13 @@
     --color-warning: #FFC107;
     --color-error: #F44336;
     --color-background: #FAFAFA;
+
+    --color-adopter-primary: #7695FF;
+    --color-adopter-secondary: #FFCB42;
+    --color-adopter-tertiary: #FF894F;
+    --color-adopter-fourth: #EA5B6F;
   }
+  
 
 /* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;

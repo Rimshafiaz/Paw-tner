@@ -10,17 +10,17 @@ function AddPet() {
   
   const [formData, setFormData] = useState({
     name: '',
-    pet_type: 'DOG',
+    pet_type: 'dog',
     breed: '',
     age_years: '',
     age_months: 0,
-    size: 'MEDIUM',
+    size: 'medium',
     weight: '',
     color: '',
     gender: 'Male',
     is_spayed_neutered: false,
     temperament: '',
-    activity_level: 'MODERATE',
+    activity_level: 'moderate',
     good_with_kids: false,
     good_with_dogs: false,
     good_with_cats: false,
@@ -282,7 +282,7 @@ function AddPet() {
 
         <div className="bg-white rounded-2xl shadow-lg p-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-secondary">Add New Pet</h1>
+            <h1 className="text-3xl font-bold from-[#4ECDC4] to-[#2DD4BF] text-transparent bg-clip-text bg-gradient-to-br">Add New Pet</h1>
             <p className="text-gray-600 mt-2">List a new pet for adoption at your shelter</p>
           </div>
 
@@ -321,11 +321,11 @@ function AddPet() {
                     className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:bg-white transition-colors"
                     required
                   >
-                    <option value="DOG">Dog</option>
-                    <option value="CAT">Cat</option>
-                    <option value="BIRD">Bird</option>
-                    <option value="RABBIT">Rabbit</option>
-                    <option value="OTHER">Other</option>
+                    <option value="dog">Dog</option>
+                    <option value="cat">Cat</option>
+                    <option value="bird">Bird</option>
+                    <option value="rabbit">Rabbit</option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
 
@@ -390,10 +390,10 @@ function AddPet() {
                     className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:bg-white transition-colors"
                     required
                   >
-                    <option value="SMALL">Small</option>
-                    <option value="MEDIUM">Medium</option>
-                    <option value="LARGE">Large</option>
-                    <option value="EXTRA_LARGE">Extra Large</option>
+                    <option value="small">Small</option>
+                    <option value="medium">Medium</option>
+                    <option value="large">Large</option>
+                    <option value="extra_large">Extra Large</option>
                   </select>
                 </div>
 
@@ -452,7 +452,7 @@ function AddPet() {
                     value={formData.adoption_fee}
                     onChange={handleChange}
                     min="0"
-                    step="1"
+                    step="100"
                     className={`w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:bg-white transition-colors ${
                       errors.adoption_fee ? 'focus:ring-red-500 ring-2 ring-red-500' : 'focus:ring-secondary'
                     }`}
@@ -497,10 +497,10 @@ function AddPet() {
                     onChange={handleChange}
                     className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-secondary focus:bg-white transition-colors"
                   >
-                    <option value="LOW">Low</option>
-                    <option value="MODERATE">Moderate</option>
-                    <option value="HIGH">High</option>
-                    <option value="VERY_HIGH">Very High</option>
+                    <option value="low">Low</option>
+                    <option value="moderate">Moderate</option>
+                    <option value="high">High</option>
+                    <option value="very_high">Very High</option>
                   </select>
                 </div>
               </div>

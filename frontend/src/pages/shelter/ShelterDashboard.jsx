@@ -107,8 +107,8 @@ function ShelterDashboard() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            Welcome back {stats?.shelter_name || currentUser?.name}! 🏠
+          <h1 className="text-3xl font-bold from-[#4ECDC4] to-[#2DD4BF] text-transparent bg-clip-text bg-gradient-to-br">
+             {(stats?.shelter_name || currentUser?.name).toUpperCase()}
           </h1>
           <p className="text-gray-600 mt-2">
             Manage your shelter and help pets find loving homes.
@@ -154,15 +154,15 @@ function ShelterDashboard() {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-blue-500">
+          <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-red-500 hover:shadow-md hover:scale-105 transition-all duration-200">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">Total Pets</h3>
-            <div className="text-3xl font-bold text-blue-600 mb-1">
+            <div className="text-3xl font-bold text-red-500 mb-1">
               {stats?.total_pets || 0}
             </div>
             <p className="text-gray-500 text-sm">All pets in your shelter</p>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-green-500">
+          <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-green-500 hover:shadow-md hover:scale-105 transition-all duration-200">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">Available</h3>
             <div className="text-3xl font-bold text-green-600 mb-1">
               {stats?.available_pets || 0}
@@ -170,7 +170,7 @@ function ShelterDashboard() {
             <p className="text-gray-500 text-sm">Ready for adoption</p>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-yellow-500">
+          <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-yellow-500 hover:shadow-md hover:scale-105 transition-all duration-200">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">Pending</h3>
             <div className="text-3xl font-bold text-yellow-600 mb-1">
               {stats?.pending_pets || 0}
@@ -178,7 +178,7 @@ function ShelterDashboard() {
             <p className="text-gray-500 text-sm">In adoption process</p>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-purple-500">
+          <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-purple-500 hover:shadow-md hover:scale-105 transition-all duration-200">
             <h3 className="text-lg font-semibold text-gray-800 mb-2">Adopted</h3>
             <div className="text-3xl font-bold text-purple-600 mb-1">
               {stats?.adopted_pets || 0}
@@ -189,8 +189,8 @@ function ShelterDashboard() {
         
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Add New Pet</h3>
+          <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-lg transition-all duration-200 group">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-secondary transition-colors duration-200">Add New Pet</h3>
             <p className="text-gray-600 text-sm mb-4">
               List a new pet for adoption
             </p>
@@ -202,9 +202,9 @@ function ShelterDashboard() {
                   navigate('/shelter/profile')
                 }
               }}
-              className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${
+              className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
                 isProfileComplete 
-                  ? 'bg-secondary text-white hover:bg-secondary/90' 
+                  ? 'bg-secondary text-white hover:bg-secondary/90 hover:shadow-md' 
                   : 'bg-amber-100 text-amber-800 hover:bg-amber-200'
               }`}
             >
@@ -212,29 +212,29 @@ function ShelterDashboard() {
             </button>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Manage Pets</h3>
+          <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-lg transition-all duration-200 group">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-secondary transition-colors duration-200">Manage Pets</h3>
             <p className="text-gray-600 text-sm mb-4">
               View and edit your pet listings
             </p>
             <button 
               onClick={() => navigate('/shelter/pets/manage')}
-              className="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary/80"
+              className="w-full bg-secondary text-white py-2 px-4 rounded-lg hover:bg-secondary/90 hover:shadow-md transition-all duration-200"
             >
               Manage Pets
             </button>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Shelter Profile</h3>
+          <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-lg transition-all duration-200 group">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-secondary transition-colors duration-200">Shelter Profile</h3>
             <p className="text-gray-600 text-sm mb-4">
               Update your contact information and details
             </p>
             <button 
               onClick={() => navigate('/shelter/profile')}
-              className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${
+              className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
                 isProfileComplete
-                  ? 'bg-gray-600 text-white hover:bg-gray-700'
+                  ? 'bg-secondary text-white hover:bg-secondary/80 hover:shadow-md'
                   : 'bg-amber-100 text-amber-800 hover:bg-amber-200 ring-2 ring-amber-300'
               }`}
             >
@@ -250,14 +250,14 @@ function ShelterDashboard() {
               <h2 className="text-xl font-bold text-gray-800">Recent Pet Listings</h2>
               <button 
                 onClick={() => navigate('/shelter/pets/manage')}
-                className="text-primary hover:underline text-sm font-medium"
+                className="text-secondary hover:text-secondary/80 hover:underline text-sm font-medium transition-colors duration-200"
               >
                 View All
               </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {dashboardData.recentPets.slice(0, 3).map((pet) => (
-                <div key={pet.id} className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
+                <div key={pet.id} className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg hover:border-secondary/30 transition-all duration-200 cursor-pointer group">
                   <div onClick={() => navigate(`/shelter/pets/view/${pet.id}`)}>
                     {pet.primary_photo_url ? (
                       <div className="w-full h-40 bg-gray-50 rounded-t-lg flex items-center justify-center">
@@ -291,7 +291,7 @@ function ShelterDashboard() {
                             e.stopPropagation();
                             navigate(`/shelter/pets/edit/${pet.id}`);
                           }}
-                          className="text-primary text-sm hover:underline"
+                          className="text-secondary text-sm hover:underline"
                         >
                           Edit
                         </button>

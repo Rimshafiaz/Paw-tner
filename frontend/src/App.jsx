@@ -3,7 +3,12 @@ import Home from './pages/Home'
 import About from './pages/About'
 import Register from './pages/register/Register'
 import Login from './pages/login/Login'
-import AdopterDashboard from './pages/dashboard/AdopterDashboard'
+import AdopterDashboard from './pages/adopter/AdopterDashboard'
+import UserProfile from './pages/adopter/UserProfile'
+import PetBrowsing from './pages/adopter/PetBrowsing'
+import PetDetail from './pages/adopter/PetDetail'
+import Favorites from './pages/adopter/Favorites'
+import PerfectPawtner from './pages/adopter/PerfectPawtner'
 import ShelterDashboard from './pages/shelter/ShelterDashboard'
 import AddPet from './pages/shelter/AddPet'
 import ManagePets from './pages/shelter/ManagePets'
@@ -55,10 +60,50 @@ const router = createBrowserRouter([
         element: <Login />
       },
       {
-        path: "dashboard",
+        path: "adopter/dashboard",
         element: (
           <ProtectedRoute requiredRole="adopter">
             <AdopterDashboard />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "adopter/profile",
+        element: (
+          <ProtectedRoute requiredRole="adopter">
+            <UserProfile />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "adopter/browse",
+        element: (
+          <ProtectedRoute requiredRole="adopter">
+            <PetBrowsing />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "adopter/pets/:petId",
+        element: (
+          <ProtectedRoute requiredRole="adopter">
+            <PetDetail />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "adopter/favorites",
+        element: (
+          <ProtectedRoute requiredRole="adopter">
+            <Favorites />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "adopter/perfect-pawtner",
+        element: (
+          <ProtectedRoute requiredRole="adopter">
+            <PerfectPawtner />
           </ProtectedRoute>
         )
       },

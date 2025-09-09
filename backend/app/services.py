@@ -344,15 +344,28 @@ class MatchingService:
     def calculate_user_pet_compatibility(user: models.User, pet: models.Pet) -> float:
         """Calculate compatibility score between user and pet"""
         
-        if not UserService.calculate_completeness_flags(user)['basic_preferences_complete']:
+        completeness_flags = UserService.calculate_completeness_flags(user)
+        print(f"DEBUG: Completeness flags: {completeness_flags}")
+        
+        if not completeness_flags['basic_preferences_complete']:
+            print(f"DEBUG: User basic preferences not complete, returning 0")
             return 0.0  
+        
+        print(f"DEBUG: User preferred_pet_type: {user.preferred_pet_type} (type: {type(user.preferred_pet_type)})")
+        print(f"DEBUG: Pet type: {pet.pet_type} (type: {type(pet.pet_type)})")
+        print(f"DEBUG: Pet name: {pet.name}")
         
         score = 50.0  
         
+        # If user has a specific pet type preference, only match that type
+        if user.preferred_pet_type and user.preferred_pet_type != pet.pet_type:
+            print(f"DEBUG: Filtering out {pet.name} - wrong pet type")
+            return 0.0  # Hard filter - no matches for wrong pet type
+        
+        # Bonus for matching preferred pet type
         if user.preferred_pet_type and user.preferred_pet_type == pet.pet_type:
-            score += 25
-        elif user.preferred_pet_type and user.preferred_pet_type != pet.pet_type:
-            score -= 30  
+            print(f"DEBUG: Bonus for {pet.name} - matching pet type")
+            score += 25  
         
         if user.activity_level and user.activity_level == pet.activity_level:
             score += 20
@@ -419,7 +432,7 @@ class MatchingService:
         completeness_flags = UserService.calculate_completeness_flags(user)
         if not completeness_flags['basic_preferences_complete']:
             return {
-                "message": "Please complete your basic preferences to get AI matches",
+                "message": "Please complete your basic preferences to get matches",
                 "matches": [],
                 "requires_preferences": True
             }

@@ -93,7 +93,7 @@ function LoginForm() {
           if (formData.userType === 'shelter') {
             navigate('/shelter/dashboard')
           } else {
-            navigate('/dashboard')
+            navigate('/adopter/dashboard')
           }
         }, 1000)
         
