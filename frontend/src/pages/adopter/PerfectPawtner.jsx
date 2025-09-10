@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import NotificationBanner from '../../components/NotificationBanner'
+import adopterPawtnerImage from '../../assets/adopter paw-tner.jpg'
 
 function PerfectPawtner() {
   const { currentUser } = useAuth()
@@ -94,41 +95,56 @@ function PerfectPawtner() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div 
+      className="min-h-screen relative"
+      style={{
+        backgroundImage: `linear-gradient(rgba(255, 248, 240, 0.85), rgba(240, 255, 248, 0.85)), url(${adopterPawtnerImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <NotificationBanner 
           notification={notification} 
           onClose={() => setNotification({ message: '', type: '', show: false })}
         />
 
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold from-[#FF8C42] to-[#FE8B02] text-transparent bg-clip-text bg-gradient-to-br">Your Perfect Paw-tner Matches</h1>
-          <p className="text-gray-600 mt-2">
-            Pets that match your preferences and lifestyle
+        <div className="text-center mb-12">
+          <div className="mb-6">
+            <span className="text-6xl animate-bounce">🎯</span>
+            <span className="text-6xl animate-pulse mx-4">💕</span>
+            <span className="text-6xl animate-bounce">✨</span>
+          </div>
+          <h1 className="text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] mb-4 drop-shadow-lg animate-pulse">
+            Your Perfect Paw-tner Matches
+          </h1>
+          <p className="text-xl text-gray-700 mb-8 font-medium">
+            🌟 Specially chosen friends just for you! 🌟
           </p>
         </div>
 
-        <div className="mb-6">
+        <div className="mb-8">
           <button
             onClick={() => navigate('/adopter/dashboard')}
-            className="flex items-center text-primary hover:text-primary/80 font-medium"
+            className="bg-gradient-to-r from-purple-400 to-pink-500 text-white px-6 py-3 rounded-2xl font-bold hover:scale-105 transition-all duration-200 flex items-center shadow-lg border-2 border-purple-300"
           >
-            ← Back to Dashboard
+            🏠 ← Back to Dashboard
           </button>
         </div>
 
         {needsPreferences ? (
-          <div className="text-center py-16">
-            <div className="text-8xl text-gray-300 mb-6">⚙️</div>
-            <h2 className="text-2xl font-semibold text-gray-600 mb-4">Complete Your Profile First</h2>
-            <p className="text-gray-500 mb-8 max-w-md mx-auto">
-              We need to know your preferences to find the perfect pets for you. Please complete your profile to get personalized matches.
+          <div className="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-3xl p-12 text-center border-2 border-yellow-200 shadow-xl">
+            <div className="text-8xl mb-6 animate-bounce">⚙️</div>
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Complete Your Profile First! 🎨</h2>
+            <p className="text-lg text-gray-600 mb-8 max-w-md mx-auto">
+              🌟 We need to know your preferences to find the perfect pets for you! Please complete your profile to get personalized matches. ✨
             </p>
             <button
               onClick={() => navigate('/adopter/profile')}
-              className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary/80 transition-colors"
+              className="bg-gradient-to-r from-orange-400 to-red-500 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:scale-105 transition-all duration-200 shadow-lg border-2 border-orange-300"
             >
-              Complete Profile
+              🎯 Complete Profile
             </button>
           </div>
         ) : matches.length === 0 ? (
@@ -146,7 +162,7 @@ function PerfectPawtner() {
                 Update Preferences
               </button>
               <button
-                onClick={() => navigate('/adopter/browse')}
+                onClick={() => navigate('/adopter/home')}
                 className="bg-gray-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-700 transition-colors"
               >
                 Browse All Pets
@@ -160,7 +176,7 @@ function PerfectPawtner() {
                 Found {matches.length} perfect {matches.length === 1 ? 'match' : 'matches'} for you
               </p>
               <button
-                onClick={() => navigate('/adopter/browse')}
+                onClick={() => navigate('/adopter/home')}
                 className="text-primary hover:text-primary/80 font-medium"
               >
                 Browse More Pets →
@@ -246,7 +262,7 @@ function PerfectPawtner() {
                 </p>
                 <div className="space-x-4">
                   <button
-                    onClick={() => navigate('/adopter/browse')}
+                    onClick={() => navigate('/adopter/home')}
                     className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary/80 transition-colors"
                   >
                     Browse All Pets
@@ -260,6 +276,7 @@ function PerfectPawtner() {
                 </div>
               </div>
             </div>
+            
           </>
         )}
       </div>

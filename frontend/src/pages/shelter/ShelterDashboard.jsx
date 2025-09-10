@@ -69,6 +69,17 @@ function ShelterDashboard() {
     fetchDashboardData()
   }, [currentUser])
 
+  const getStatusColor = (status) => {
+    const upperStatus = status?.toUpperCase() || ''
+    switch (upperStatus) {
+      case 'AVAILABLE': return 'bg-green-100 text-green-800'
+      case 'PENDING': return 'bg-yellow-100 text-yellow-800'
+      case 'ADOPTED': return 'bg-purple-100 text-purple-800'
+      case 'ON_HOLD': return 'bg-blue-100 text-blue-800'
+      default: return 'bg-gray-100 text-gray-800'
+    }
+  }
+
   if (dashboardData.loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -277,14 +288,10 @@ function ShelterDashboard() {
                     )}
                     <div className="p-4">
                       <h3 className="font-semibold text-gray-800">{pet.name}</h3>
-                      <p className="text-gray-600 text-sm">{pet.breed} • {pet.age_years} {pet.age_years === 1 ? 'year' : 'years'}</p>
+                      <p className="text-gray-600 text-sm">{pet.breed} • {pet.age_years > 0 ? `${pet.age_years} ${pet.age_years === 1 ? 'year' : 'years'}` : `${pet.age_months || 0} ${pet.age_months === 1 ? 'month' : 'months'}`}</p>
                       <div className="mt-2 flex justify-between items-center">
-                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-                          pet.adoption_status === 'AVAILABLE' ? 'bg-green-100 text-green-800' :
-                          pet.adoption_status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-purple-100 text-purple-800'
-                        }`}>
-                          {pet.adoption_status}
+                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(pet.adoption_status)}`}>
+                          {pet.adoption_status?.charAt(0).toUpperCase() + pet.adoption_status?.slice(1).toLowerCase() || 'Available'}
                         </span>
                         <button 
                           onClick={(e) => {

@@ -4,8 +4,8 @@ import About from './pages/About'
 import Register from './pages/register/Register'
 import Login from './pages/login/Login'
 import AdopterDashboard from './pages/adopter/AdopterDashboard'
+import AdopterHome from './pages/adopter/AdopterHome'
 import UserProfile from './pages/adopter/UserProfile'
-import PetBrowsing from './pages/adopter/PetBrowsing'
 import PetDetail from './pages/adopter/PetDetail'
 import Favorites from './pages/adopter/Favorites'
 import PerfectPawtner from './pages/adopter/PerfectPawtner'
@@ -15,6 +15,8 @@ import ManagePets from './pages/shelter/ManagePets'
 import EditPet from './pages/shelter/EditPet'
 import ShelterProfile from './pages/shelter/ShelterProfile'
 import ViewPet from './pages/shelter/ViewPet'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import ShelterManagement from './pages/admin/ShelterManagement'
 import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
@@ -60,6 +62,18 @@ const router = createBrowserRouter([
         element: <Login />
       },
       {
+        path: "pets/:petId",
+        element: <PetDetail />
+      },
+      {
+        path: "adopter/home",
+        element: (
+          <ProtectedRoute requiredRole="adopter">
+            <AdopterHome />
+          </ProtectedRoute>
+        )
+      },
+      {
         path: "adopter/dashboard",
         element: (
           <ProtectedRoute requiredRole="adopter">
@@ -72,14 +86,6 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute requiredRole="adopter">
             <UserProfile />
-          </ProtectedRoute>
-        )
-      },
-      {
-        path: "adopter/browse",
-        element: (
-          <ProtectedRoute requiredRole="adopter">
-            <PetBrowsing />
           </ProtectedRoute>
         )
       },
@@ -154,7 +160,23 @@ const router = createBrowserRouter([
             <ShelterProfile />
           </ProtectedRoute>
         )
-      }
+      },
+      // {
+      //   path: "admin/dashboard",
+      //   element: (
+      //     <ProtectedRoute requiredRole="admin">
+      //       <AdminDashboard />
+      //     </ProtectedRoute>
+      //   )
+      // },
+      // {
+      //   path: "admin/shelters",
+      //   element: (
+      //     <ProtectedRoute requiredRole="admin">
+      //       <ShelterManagement />
+      //     </ProtectedRoute>
+      //   )
+      // }
     ]
   }
 ])

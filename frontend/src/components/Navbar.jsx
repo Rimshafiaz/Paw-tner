@@ -22,20 +22,28 @@ function Navbar() {
             <Link to="/about" className="text-gray-600 hover:bg-gradient-to-r hover:from-[#FF5733] hover:to-[#00FFEA] hover:bg-clip-text hover:text-transparent font-medium transition-all duration-200">
               About
             </Link>
-            <Link to="/contact" className="text-gray-600 hover:bg-gradient-to-r hover:from-[#FF5733] hover:to-[#00FFEA] hover:bg-clip-text hover:text-transparent font-medium transition-all duration-200">
-              Contact
+            <Link to="/" className="text-gray-600 hover:bg-gradient-to-r hover:from-[#FF5733] hover:to-[#00FFEA] hover:bg-clip-text hover:text-transparent font-medium transition-all duration-200">
+              Home
             </Link>
             
             
             {isLoggedIn ? (
               <div className="flex items-center space-x-4">
                 <Link 
-                  to={currentUser?.userType === 'shelter' ? '/shelter/dashboard' : '/adopter/dashboard'} 
+                  to={
+                    currentUser?.userType === 'shelter' ? '/shelter/dashboard' 
+                    : currentUser?.userType === 'admin' ? '/admin/dashboard'
+                    : '/adopter/dashboard'
+                  } 
                   className="text-gray-600 hover:bg-gradient-to-r hover:from-[#FF5733] hover:to-[#00FFEA] hover:bg-clip-text hover:text-transparent font-medium transition-all duration-200"
                 >
                   Dashboard
                 </Link>
-                <span className={currentUser.userType === 'shelter' ? "text-secondary font-normal" : "text-primary font-normal"}>
+                <span className={
+                  currentUser.userType === 'shelter' ? "text-secondary font-normal" 
+                  : currentUser.userType === 'admin' ? "text-purple-600 font-normal"
+                  : "text-primary font-normal"
+                }>
                   Welcome {currentUser?.name || currentUser?.email || 'User'}
                 </span>
                 <button 

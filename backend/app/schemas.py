@@ -46,11 +46,14 @@ class PetCreate(PetBase):
 
 class PetUpdate(BaseModel):
     name: Optional[str] = None
+    pet_type: Optional[PetType] = None
     breed: Optional[str] = None
     age_years: Optional[int] = None
     age_months: Optional[int] = None
+    size: Optional[PetSize] = None
     weight: Optional[float] = None
     color: Optional[str] = None
+    gender: Optional[str] = None
     is_spayed_neutered: Optional[bool] = None
     temperament: Optional[str] = None
     activity_level: Optional[ActivityLevel] = None

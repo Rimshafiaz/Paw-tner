@@ -73,7 +73,7 @@ function EditPet() {
         const pet = await response.json()
         setFormData({
           name: pet.name || '',
-          pet_type: pet.pet_type ? pet.pet_type.toUpperCase() : 'DOG',
+          pet_type: pet.pet_type || 'dog',
           breed: pet.breed || '',
           age_years: pet.age_years || '',
           age_months: pet.age_months || 0,
@@ -92,9 +92,9 @@ function EditPet() {
           medical_history: pet.medical_history || '',
           special_needs: pet.special_needs || '',
           vaccination_status: pet.vaccination_status || 'Up to date',
-          adoption_fee: pet.adoption_fee ? pet.adoption_fee.toString() : '',
+          adoption_fee: pet.adoption_fee !== null && pet.adoption_fee !== undefined ? pet.adoption_fee.toString() : '',
           description: pet.description || '',
-          adoption_status: pet.adoption_status ? pet.adoption_status.toUpperCase() : 'AVAILABLE',
+          adoption_status: pet.adoption_status || 'available',
           shelter_id: pet.shelter_id
         })
         
@@ -130,7 +130,7 @@ function EditPet() {
     if (!formData.name.trim()) newErrors.name = 'Pet name is required'
     if (!formData.age_years || formData.age_years < 0) newErrors.age_years = 'Valid age is required'
     if (!formData.temperament.trim()) newErrors.temperament = 'Temperament is required'
-    if (!formData.adoption_fee || formData.adoption_fee < 0) newErrors.adoption_fee = 'Valid adoption fee is required'
+    if (formData.adoption_fee === '' || formData.adoption_fee < 0) newErrors.adoption_fee = 'Valid adoption fee is required'
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -172,13 +172,18 @@ function EditPet() {
       })
 
       if (response.ok) {
+        const updatedPet = await response.json()
         showNotification(`${formData.name} has been updated successfully!`, 'success')
+        
+        // Refresh the pet data to show the updated values
+        await fetchPetData()
         
         setTimeout(() => {
           navigate('/shelter/pets/manage')
         }, 2000)
       } else {
         const error = await response.json()
+        console.error('Update error:', error)
         showNotification(error.detail || 'Failed to update pet. Please try again.', 'error')
       }
     } catch (error) {
@@ -396,7 +401,7 @@ function EditPet() {
                     value={formData.adoption_fee}
                     onChange={handleChange}
                     min="0"
-                    step="100"
+                    step="1"
                     className={`w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:bg-white transition-colors ${
                       errors.adoption_fee ? 'focus:ring-red-500 ring-2 ring-red-500' : 'focus:ring-secondary'
                     }`}

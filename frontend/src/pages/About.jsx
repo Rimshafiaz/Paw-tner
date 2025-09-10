@@ -1,10 +1,19 @@
 import catImage from '../assets/cat.jpg'
 import dogImage from '../assets/dog.png'
 import pawTnerImage from '../assets/paw-tner.jpg'
+import pawtnerLoveImage from '../assets/paw-tner love.jpg'
 
 function About() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-teal-50">
+    <div 
+      className="min-h-screen relative"
+      style={{
+        backgroundImage: `linear-gradient(rgba(255, 248, 240, 0.85), rgba(240, 255, 248, 0.85)), url(${pawtnerLoveImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       
       <section className="py-20">
         <div className="max-w-5xl mx-auto px-6">

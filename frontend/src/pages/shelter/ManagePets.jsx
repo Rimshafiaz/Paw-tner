@@ -53,13 +53,12 @@ function ManagePets() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ adoption_status: newStatus })
+        body: JSON.stringify({ adoption_status: newStatus.toLowerCase() })
       })
 
       if (response.ok) {
-        setPets(pets.map(pet => 
-          pet.id === petId ? { ...pet, adoption_status: newStatus } : pet
-        ))
+        // Refresh pet data from backend to ensure consistency
+        await fetchPets()
         showNotification('Pet status updated successfully', 'success')
       } else {
         showNotification('Failed to update pet status', 'error')
@@ -92,7 +91,8 @@ function ManagePets() {
   }
 
   const getStatusColor = (status) => {
-    switch (status) {
+    const upperStatus = status?.toUpperCase() || ''
+    switch (upperStatus) {
       case 'AVAILABLE': return 'bg-green-100 text-green-800'
       case 'PENDING': return 'bg-yellow-100 text-yellow-800'
       case 'ADOPTED': return 'bg-purple-100 text-purple-800'
@@ -183,13 +183,14 @@ function ManagePets() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-sm">
-                          <p className="text-gray-900">{pet.pet_type} • {pet.age_years} years</p>
+                          <p className="text-gray-900">{pet.pet_type} •  {pet.age_years > 0  ? `${pet.age_years} ${pet.age_years === 1 ? 'year' : 'years'}`:  'Less than a year' }</p>
+
                           <p className="text-gray-600">{pet.size} • {pet.adoption_fee && Number(pet.adoption_fee) > 0 ? `PKR ${Number(pet.adoption_fee)}` : 'Free'}</p>
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <select
-                          value={pet.adoption_status}
+                          value={pet.adoption_status?.toUpperCase() || 'AVAILABLE'}
                           onChange={(e) => handleStatusChange(pet.id, e.target.value)}
                           className={`px-3 py-1 rounded-full text-xs font-medium border-0 focus:outline-none focus:ring-2 focus:ring-primary ${getStatusColor(pet.adoption_status)}`}
                         >

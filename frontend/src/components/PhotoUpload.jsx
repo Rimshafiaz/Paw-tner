@@ -94,6 +94,7 @@ function PhotoUpload({ petId, currentPhotoUrl, onPhotoUploaded, onError }) {
           
           if (xhr.status === 200) {
             const response = JSON.parse(xhr.responseText)
+            setPreview(response.photo_url)
             onPhotoUploaded?.(response.photo_url)
             setSelectedFile(null)
             setUploadProgress(0)
@@ -132,6 +133,42 @@ function PhotoUpload({ petId, currentPhotoUrl, onPhotoUploaded, onError }) {
     fileInputRef.current?.click()
   }
 
+  const deletePhoto = async () => {
+    if (!petId || uploading) return
+
+    setUploading(true)
+    
+    try {
+      const token = localStorage.getItem('auth_token')
+      
+      // Use the pet update endpoint to set photo to null
+      const response = await fetch(`http://localhost:8000/pets/${petId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          primary_photo_url: null
+        })
+      })
+      
+      if (response.ok) {
+        setPreview(null)
+        setSelectedFile(null)
+        onPhotoUploaded?.(null)
+        onError?.('Photo deleted successfully')
+      } else {
+        const errorResponse = await response.json()
+        onError?.(errorResponse.detail || 'Failed to delete photo')
+      }
+    } catch (error) {
+      onError?.('Network error. Please try again.')
+    } finally {
+      setUploading(false)
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="text-sm font-medium text-gray-700 mb-2">
@@ -159,12 +196,25 @@ function PhotoUpload({ petId, currentPhotoUrl, onPhotoUploaded, onError }) {
             )}
             
             {!uploading && (
-              <button
-                onClick={removePhoto}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                {selectedFile ? 'Cancel' : 'Change Photo'}
-              </button>
+              <>
+                {selectedFile ? (
+                  <button
+                    onClick={removePhoto}
+                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                ) : (
+                  currentPhotoUrl && (
+                    <button
+                      onClick={deletePhoto}
+                      className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium"
+                    >
+                      Delete Photo
+                    </button>
+                  )
+                )}
+              </>
             )}
           </div>
           

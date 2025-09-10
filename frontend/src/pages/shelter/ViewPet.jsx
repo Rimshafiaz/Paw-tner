@@ -138,9 +138,7 @@ function ViewPet() {
                   <div className="flex justify-between">
                     <span className="text-gray-600">Age:</span>
                     <span className="font-medium">
-                      {pet.age_years ? `${pet.age_years} years` : ''}
-                      {pet.age_months ? ` ${pet.age_months} months` : ''}
-                      {!pet.age_years && !pet.age_months ? 'Not specified' : ''}
+                      {pet.age_years > 0 ? `${pet.age_years} ${pet.age_years === 1 ? 'year' : 'years'}` : pet.age_months ? `${pet.age_months} ${pet.age_months === 1 ? 'month' : 'months'}` : 'Not specified'}
                     </span>
                   </div>
                   <div className="flex justify-between">

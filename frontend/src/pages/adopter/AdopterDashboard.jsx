@@ -20,7 +20,7 @@ function AdopterDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div 
               className="bg-white p-6 rounded-lg shadow-sm hover:shadow-lg transition-all duration-200 group cursor-pointer"
-              onClick={() => navigate('/adopter/browse')}
+              onClick={() => navigate('/adopter/home')}
             >
               <h3 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-adopter-primary transition-colors duration-200">Browse Pets</h3>
               <p className="text-gray-600 text-sm mb-4">
@@ -29,7 +29,7 @@ function AdopterDashboard() {
               <button 
                 onClick={(e) => {
                   e.stopPropagation()
-                  navigate('/adopter/browse')
+                  navigate('/adopter/home')
                 }}
                 className="w-full bg-adopter-primary text-white py-2 px-4 rounded-lg hover:bg-adopter-primary/80 hover:shadow-md transition-all duration-200"
               >

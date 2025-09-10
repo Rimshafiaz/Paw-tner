@@ -93,7 +93,7 @@ function LoginForm() {
           if (formData.userType === 'shelter') {
             navigate('/shelter/dashboard')
           } else {
-            navigate('/adopter/dashboard')
+            navigate('/adopter/home')
           }
         }, 1000)
         
@@ -121,7 +121,7 @@ function LoginForm() {
       
       <div className="bg-white rounded-2xl shadow-lg p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-tertiary mb-2">Welcome Back</h1>
+          <h1 className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#FF2C00] to-[#00FF94] mb-2 drop-shadow-lg">Welcome Back</h1>
           <p className="text-gray-600">Sign in to your Paw-tner account</p>
         </div>
 
@@ -175,13 +175,13 @@ function LoginForm() {
           </button>
         </form>
         
-        <div className="text-center mt-6">
-          <p className="text-gray-600">
-            Don't have an account?{' '}
-            <a href="/register" className="text-blue-400 font-medium hover:underline">
+        <div className="text-center mt-8">
+          <div className="flex items-center justify-center space-x-2 text-gray-500 text-sm">
+            <span>Don't have an account?</span>
+            <a href="/register" className="text-primary font-semibold hover:text-primary/80 transition-colors">
               Sign up
             </a>
-          </p>
+          </div>
         </div>
       </div>
     </div>

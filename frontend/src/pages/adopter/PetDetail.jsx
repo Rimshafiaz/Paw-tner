@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import NotificationBanner from '../../components/NotificationBanner'
+import adopterPawtnerImage from '../../assets/adopter paw-tner.jpg'
 
 function PetDetail() {
   const { petId } = useParams()
@@ -20,6 +21,17 @@ function PetDetail() {
     setTimeout(() => {
       setNotification({ message: '', type: '', show: false })
     }, 5000)
+  }
+
+  const getStatusColor = (status) => {
+    const upperStatus = status?.toUpperCase() || ''
+    switch (upperStatus) {
+      case 'AVAILABLE': return 'bg-green-100 text-green-800'
+      case 'PENDING': return 'bg-yellow-100 text-yellow-800'
+      case 'ADOPTED': return 'bg-purple-100 text-purple-800'
+      case 'ON_HOLD': return 'bg-blue-100 text-blue-800'
+      default: return 'bg-gray-100 text-gray-800'
+    }
   }
 
   useEffect(() => {
@@ -57,11 +69,11 @@ function PetDetail() {
         }
       } else {
         showNotification('Pet not found', 'error')
-        navigate('/adopter/browse')
+        navigate('/adopter/home')
       }
     } catch (error) {
       showNotification('Failed to load pet details', 'error')
-      navigate('/adopter/browse')
+      navigate('/adopter/home')
     } finally {
       setLoading(false)
     }
@@ -153,10 +165,19 @@ function PetDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg">Loading pet details...</p>
+      <div 
+        className="min-h-screen flex items-center justify-center"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255, 248, 240, 0.85), rgba(240, 255, 248, 0.85)), url(${adopterPawtnerImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        <div className="text-center bg-white/80 backdrop-blur-sm rounded-3xl p-12 shadow-2xl border border-white/50">
+          <div className="animate-bounce text-6xl mb-6">🐶</div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary mx-auto mb-6"></div>
+          <p className="text-gray-700 text-xl font-semibold">Finding your furry friend... 🔍✨</p>
         </div>
       </div>
     )
@@ -164,16 +185,24 @@ function PetDetail() {
 
   if (!pet) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-6xl text-gray-300 mb-4">🐾</div>
-          <h2 className="text-2xl font-semibold text-gray-600 mb-2">Pet not found</h2>
-          <p className="text-gray-500 mb-6">This pet may have been adopted or is no longer available</p>
+      <div 
+        className="min-h-screen flex items-center justify-center"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255, 248, 240, 0.85), rgba(240, 255, 248, 0.85)), url(${adopterPawtnerImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed'
+        }}
+      >
+        <div className="text-center bg-white/80 backdrop-blur-sm rounded-3xl p-12 shadow-2xl border border-white/50">
+          <div className="text-8xl mb-6 animate-pulse">😢</div>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-red-500 text-transparent bg-clip-text mb-4">Oops! Pet not found 🐾</h2>
+          <p className="text-gray-700 mb-8 text-lg">This adorable friend may have found their forever home already! 🏠✨</p>
           <button
-            onClick={() => navigate('/adopter/browse')}
-            className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary/80"
+            onClick={() => navigate('/adopter/home')}
+            className="bg-gradient-to-r from-primary to-secondary text-white px-8 py-4 rounded-full font-semibold hover:from-primary/80 hover:to-secondary/80 transform hover:scale-105 transition-all duration-200 shadow-lg"
           >
-            Browse Other Pets
+            🔍 Find Other Amazing Pets! 🌈
           </button>
         </div>
       </div>
@@ -181,7 +210,15 @@ function PetDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div 
+      className="min-h-screen py-8"
+      style={{
+        backgroundImage: `linear-gradient(rgba(255, 248, 240, 0.85), rgba(240, 255, 248, 0.85)), url(${adopterPawtnerImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <NotificationBanner 
           notification={notification} 
@@ -191,21 +228,21 @@ function PetDetail() {
         {/* Back Button */}
         <div className="mb-6">
           <button
-            onClick={() => navigate('/adopter/browse')}
-            className="flex items-center text-primary hover:text-primary/80 font-medium"
+            onClick={() => navigate('/adopter/home')}
+            className="flex items-center bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full text-primary hover:text-primary/80 font-medium hover:bg-white/90 transition-all duration-200 transform hover:scale-105 shadow-lg"
           >
-            ← Back to Browse Pets
+            🏠 ← Back to Browse Pets
           </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div className="relative h-96 bg-gray-100 flex items-center justify-center">
+          <div className="bg-transparent backdrop-blur-sm rounded-3xl shadow-lg overflow-hidden border-2 border-pink-200 hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]">
+            <div className="relative h-96 flex items-center justify-center p-4">
               {pet.primary_photo_url ? (
                 <img
                   src={getImageUrl(pet.primary_photo_url)}
                   alt={pet.name}
-                  className="w-full h-full object-contain"
+                  className="max-w-full max-h-full object-contain rounded-2xl border-4 border-white shadow-lg"
                   onError={(e) => {
                     e.target.style.display = 'none'
                     e.target.nextSibling.style.display = 'flex'
@@ -222,14 +259,14 @@ function PetDetail() {
               <button
                 onClick={toggleFavorite}
                 disabled={favoritesLoading}
-                className={`absolute top-4 right-4 w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-colors ${
+                className={`absolute top-4 right-4 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 transform hover:scale-110 ${
                   isFavorite 
-                    ? 'bg-red-500 text-white hover:bg-red-600' 
-                    : 'bg-white text-gray-400 hover:text-red-500'
+                    ? 'bg-gradient-to-r from-red-400 to-pink-500 text-white hover:from-red-500 hover:to-pink-600 animate-pulse' 
+                    : 'bg-white/90 backdrop-blur-sm text-gray-400 hover:text-red-500 hover:bg-white'
                 }`}
               >
-                <span className="text-xl">
-                  {favoritesLoading ? '...' : (isFavorite ? '♥' : '♡')}
+                <span className="text-2xl">
+                  {favoritesLoading ? '💫' : (isFavorite ? '💖' : '🤍')}
                 </span>
               </button>
             </div>
@@ -237,28 +274,22 @@ function PetDetail() {
 
           <div className="space-y-6">
 
-            <div className="bg-white rounded-2xl shadow-sm p-6">
+            <div className="bg-gradient-to-br from-orange-50/90 to-yellow-50/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 border border-orange-200 hover:shadow-xl transition-all duration-300">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h1 className="text-3xl font-bold from-[#FF8C42] to-[#FE8B02] text-transparent bg-clip-text bg-gradient-to-br mb-2">{pet.name}</h1>
+                  <h1 className="text-4xl font-extrabold from-[#FF8C42] to-[#FE8B02] text-transparent bg-clip-text bg-gradient-to-br mb-2 "> {pet.name}🧡</h1>
                   <p className="text-lg text-gray-600 capitalize">
                     {pet.pet_type?.toLowerCase()} • {formatAge(pet.age_years, pet.age_months)}
                   </p>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-primary">
-                    {pet.adoption_fee && Number(pet.adoption_fee) > 0 
+                  <div className="text-2xl font-bold bg-gradient-to-r from-green-500 to-emerald-600 text-transparent bg-clip-text">
+                     {pet.adoption_fee && Number(pet.adoption_fee) > 0 
                       ? `PKR ${Number(pet.adoption_fee)}` 
-                      : 'Free'}
+                      : 'Free Adoption! 🎉'}
                   </div>
-                  <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                    pet.adoption_status === 'AVAILABLE' || pet.adoption_status === 'available'
-                      ? 'bg-green-100 text-green-800'
-                      : pet.adoption_status === 'PENDING' || pet.adoption_status === 'pending'
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}>
-                    {pet.adoption_status}
+                  <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(pet.adoption_status)}`}>
+                    {pet.adoption_status?.charAt(0).toUpperCase() + pet.adoption_status?.slice(1).toLowerCase() || 'Available'}
                   </div>
                 </div>
               </div>
@@ -268,8 +299,8 @@ function PetDetail() {
               )}
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">Basic Information</h2>
+            <div className="bg-gradient-to-br from-blue-50/90 to-cyan-50/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 border border-blue-200 hover:shadow-xl transition-all duration-300">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 text-transparent bg-clip-text mb-6">📜 Basic Information</h2>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <span className="text-sm font-medium text-gray-500">Breed</span>
@@ -298,8 +329,8 @@ function PetDetail() {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">Personality & Care</h2>
+            <div className="bg-gradient-to-br from-green-50/90 to-teal-50/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 border border-green-200 hover:shadow-xl transition-all duration-300">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-teal-600 text-transparent bg-clip-text mb-6">😊 Personality & Care</h2>
               <div className="space-y-4">
                 {pet.temperament && (
                   <div>
@@ -316,29 +347,29 @@ function PetDetail() {
                 )}
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center space-x-2">
-                    <span className={`w-3 h-3 rounded-full ${pet.good_with_kids ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                    <span className="text-sm text-gray-700">Good with children</span>
+                  <div className="flex items-center space-x-3 bg-white/50 rounded-full px-4 py-2 border border-white/30">
+                    <span className="text-lg">{pet.good_with_kids ? '👶💕' : '🚫👶'}</span>
+                    <span className="text-sm text-gray-700 font-medium">Good with children</span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <span className={`w-3 h-3 rounded-full ${pet.good_with_dogs ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                    <span className="text-sm text-gray-700">Good with dogs</span>
+                  <div className="flex items-center space-x-3 bg-white/50 rounded-full px-4 py-2 border border-white/30">
+                    <span className="text-lg">{pet.good_with_dogs ? '🐶💕' : '🚫🐶'}</span>
+                    <span className="text-sm text-gray-700 font-medium">Good with dogs</span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <span className={`w-3 h-3 rounded-full ${pet.good_with_cats ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                    <span className="text-sm text-gray-700">Good with cats</span>
+                  <div className="flex items-center space-x-3 bg-white/50 rounded-full px-4 py-2 border border-white/30">
+                    <span className="text-lg">{pet.good_with_cats ? '🐱💕' : '🚫🐱'}</span>
+                    <span className="text-sm text-gray-700 font-medium">Good with cats</span>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <span className={`w-3 h-3 rounded-full ${pet.house_trained ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                    <span className="text-sm text-gray-700">House trained</span>
+                  <div className="flex items-center space-x-3 bg-white/50 rounded-full px-4 py-2 border border-white/30">
+                    <span className="text-lg">{pet.house_trained ? '🏠✅' : '🏠❌'}</span>
+                    <span className="text-sm text-gray-700 font-medium">House trained</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {(pet.medical_history || pet.vaccination_status || pet.special_needs) && (
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">Health Information</h2>
+              <div className="bg-gradient-to-br from-red-50/90 to-pink-50/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 border border-red-200 hover:shadow-xl transition-all duration-300">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-pink-600 text-transparent bg-clip-text mb-6">🌡️ Health Information</h2>
                 <div className="space-y-3">
                   {pet.vaccination_status && (
                     <div>
@@ -363,8 +394,8 @@ function PetDetail() {
             )}
 
             {shelter && (
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">Contact Shelter</h2>
+              <div className="bg-gradient-to-br from-purple-50/90 to-indigo-50/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 border border-purple-200 hover:shadow-xl transition-all duration-300">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent bg-clip-text mb-6">🏠 Contact Shelter</h2>
                 <div className="space-y-3">
                   <div>
                     <span className="text-sm font-medium text-gray-500">Shelter Name</span>

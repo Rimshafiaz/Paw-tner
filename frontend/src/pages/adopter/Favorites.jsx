@@ -157,7 +157,7 @@ function Favorites() {
             </p>
             <div className="space-x-4">
               <button
-                onClick={() => navigate('/adopter/browse')}
+                onClick={() => navigate('/adopter/home')}
                 className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary/80 transition-colors"
               >
                 Browse Pets
@@ -177,7 +177,7 @@ function Favorites() {
                 You have {favorites.length} favorite {favorites.length === 1 ? 'pet' : 'pets'}
               </p>
               <button
-                onClick={() => navigate('/adopter/browse')}
+                onClick={() => navigate('/adopter/home')}
                 className="text-primary hover:text-primary/80 font-medium"
               >
                 Browse More Pets →
@@ -290,7 +290,7 @@ function Favorites() {
                 </p>
                 <div className="space-x-4">
                   <button
-                    onClick={() => navigate('/adopter/browse')}
+                    onClick={() => navigate('/adopter/home')}
                     className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary/80 transition-colors"
                   >
                     Browse All Pets

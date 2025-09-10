@@ -117,10 +117,11 @@ class PetCRUD:
         if not db_pet:
             return None
         
-        
         update_data = pet_update.dict(exclude_unset=True)
+        
         for field, value in update_data.items():
-            setattr(db_pet, field, value)
+            if hasattr(db_pet, field):
+                setattr(db_pet, field, value)
         
         db.commit()
         db.refresh(db_pet)

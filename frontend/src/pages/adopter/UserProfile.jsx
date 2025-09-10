@@ -60,7 +60,6 @@ function UserProfile() {
 
       if (response.ok) {
         const userData = await response.json()
-        console.log('Loaded user data:', userData)
         setFormData({
           preferred_pet_type: userData.preferred_pet_type || '',
           preferred_age_min: userData.preferred_age_min || '',
@@ -131,9 +130,6 @@ function UserProfile() {
         preferred_age_min: formData.preferred_age_min ? parseInt(formData.preferred_age_min) : null,
         preferred_age_max: formData.preferred_age_max ? parseInt(formData.preferred_age_max) : null
       }
-
-      console.log('Saving preference data:', updateData)
-
 
       const response = await fetch(`http://localhost:8000/users/${userId}/preferences`, {
         method: 'PUT',

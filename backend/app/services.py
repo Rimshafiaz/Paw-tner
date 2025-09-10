@@ -345,26 +345,17 @@ class MatchingService:
         """Calculate compatibility score between user and pet"""
         
         completeness_flags = UserService.calculate_completeness_flags(user)
-        print(f"DEBUG: Completeness flags: {completeness_flags}")
         
         if not completeness_flags['basic_preferences_complete']:
-            print(f"DEBUG: User basic preferences not complete, returning 0")
-            return 0.0  
-        
-        print(f"DEBUG: User preferred_pet_type: {user.preferred_pet_type} (type: {type(user.preferred_pet_type)})")
-        print(f"DEBUG: Pet type: {pet.pet_type} (type: {type(pet.pet_type)})")
-        print(f"DEBUG: Pet name: {pet.name}")
+            return 0.0
         
         score = 50.0  
         
         # If user has a specific pet type preference, only match that type
         if user.preferred_pet_type and user.preferred_pet_type != pet.pet_type:
-            print(f"DEBUG: Filtering out {pet.name} - wrong pet type")
-            return 0.0  # Hard filter - no matches for wrong pet type
+            return 0.0
         
-        # Bonus for matching preferred pet type
         if user.preferred_pet_type and user.preferred_pet_type == pet.pet_type:
-            print(f"DEBUG: Bonus for {pet.name} - matching pet type")
             score += 25  
         
         if user.activity_level and user.activity_level == pet.activity_level:
@@ -413,8 +404,9 @@ class MatchingService:
         for pet in pets:
             compatibility = MatchingService.calculate_user_pet_compatibility(user, pet)
             if compatibility > 30: 
+                pet_summary = schemas.PetSummary.from_orm(pet)
                 matches.append({
-                    "pet": pet,
+                    "pet": pet_summary,
                     "compatibility_score": compatibility
                 })
         
@@ -525,8 +517,8 @@ class DuplicateDetectionService:
         
        
         age_weight = 20.0
-        age1_months = (pet1.get('age_years', 0) * 12) + pet1.get('age_months', 0)
-        age2_months = (pet2.get('age_years', 0) * 12) + pet2.get('age_months', 0)
+        age1_months = (pet1.get('age_years', 0) or 0) * 12 + (pet1.get('age_months', 0) or 0)
+        age2_months = (pet2.get('age_years', 0) or 0) * 12 + (pet2.get('age_months', 0) or 0)
         age_diff = abs(age1_months - age2_months)
         if age_diff <= 6:
             similarity_score += age_weight * (1 - age_diff / 12)

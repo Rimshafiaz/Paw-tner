@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException, status, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from .database import get_db, engine, create_tables, recreate_tables
@@ -265,7 +267,8 @@ def update_pet(pet_id: int, pet_update: schemas.PetUpdate, db: Session = Depends
         if hasattr(current_user, '__tablename__') and not current_user.is_active:
             raise HTTPException(403, "Account suspended")
         
-        return services.PetService.update_pet(db=db, pet_id=pet_id, update_data=pet_update)
+        result = services.PetService.update_pet(db=db, pet_id=pet_id, update_data=pet_update)
+        return result
     except ValueError as e:  
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:  
@@ -338,6 +341,45 @@ def upload_pet_photo(pet_id: int, file: UploadFile = File(...), db: Session = De
             "photo_url": photo_url,
             "filename": unique_filename
         }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/pets/{pet_id}/delete-photo")
+def delete_pet_photo(pet_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+    try:
+        user_role = None
+        if hasattr(current_user, 'role') and current_user.role:
+            user_role = current_user.role.value
+        elif hasattr(current_user, '__tablename__') and current_user.__tablename__ == "shelters":
+            user_role = "shelter"
+            
+        if user_role != "shelter":
+            raise HTTPException(403, "Only shelters can delete pet photos")
+        
+        if hasattr(current_user, '__tablename__') and not current_user.is_active:
+            raise HTTPException(403, "Account suspended")
+
+        pet = crud.PetCRUD.get_pet(db, pet_id)
+        if not pet:
+            raise HTTPException(404, f"Pet with ID {pet_id} not found")
+            
+        if pet.shelter_id != current_user.id:
+            raise HTTPException(403, "You can only delete photos for your own pets")
+        
+        # Delete the physical file if it's a local upload (not external URL like Unsplash)
+        if pet.primary_photo_url and pet.primary_photo_url.startswith('/uploads/'):
+            file_path = f"./uploads{pet.primary_photo_url[8:]}"  # Remove '/uploads' from URL
+            if os.path.exists(file_path):
+                os.remove(file_path)
+        
+        # Clear the photo URL from database (works for both local and external URLs)
+        pet.primary_photo_url = None
+        db.commit()
+        
+        return {"message": "Photo deleted successfully"}
         
     except HTTPException:
         raise
@@ -467,10 +509,8 @@ def get_user_profile_completeness(user_id: int, db: Session = Depends(get_db), c
 
 @app.get("/users/{user_id}/matches")
 def get_user_matches(user_id: int, limit: int = 20, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    """Get matched pets for a user (own matches only)"""
+    """Get AI-matched pets for a user (own matches only)"""
     try:
-        print(f"DEBUG: get_user_matches called for user_id={user_id}, limit={limit}")
-        
         if current_user.id != user_id:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -480,12 +520,13 @@ def get_user_matches(user_id: int, limit: int = 20, db: Session = Depends(get_db
         result = services.MatchingService.get_user_matches_with_validation(
             db=db, user_id=user_id, limit=limit
         )
-        print(f"DEBUG: get_user_matches returning: {type(result)} with keys: {result.keys() if isinstance(result, dict) else 'N/A'}")
-        return result
+        
+        return JSONResponse(content=jsonable_encoder(result))
     except ValueError as e:  
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:   
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post("/users/{user_id}/favorites/{pet_id}")
 def add_favorite(user_id: int, pet_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
