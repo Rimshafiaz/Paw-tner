@@ -22,7 +22,7 @@ function Navbar() {
             <Link to="/about" className="text-gray-600 hover:bg-gradient-to-r hover:from-[#FF5733] hover:to-[#00FFEA] hover:bg-clip-text hover:text-transparent font-medium transition-all duration-200">
               About
             </Link>
-            <Link to="/" className="text-gray-600 hover:bg-gradient-to-r hover:from-[#FF5733] hover:to-[#00FFEA] hover:bg-clip-text hover:text-transparent font-medium transition-all duration-200">
+            <Link to={currentUser?.userType==='adopter'? 'adopter/home':'/'} className="text-gray-600 hover:bg-gradient-to-r hover:from-[#FF5733] hover:to-[#00FFEA] hover:bg-clip-text hover:text-transparent font-medium transition-all duration-200">
               Home
             </Link>
             

@@ -85,10 +85,15 @@ function PerfectPawtner() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{
+        backgroundImage: `linear-gradient(rgba(255, 248, 240, 0.85), rgba(240, 255, 248, 0.85)), url(${adopterPawtnerImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg">Finding your perfect matches...</p>
+          <p className="text-gray-600 text-lg font-medium">Finding your perfect matches... ✨</p>
         </div>
       </div>
     )
@@ -110,6 +115,7 @@ function PerfectPawtner() {
           onClose={() => setNotification({ message: '', type: '', show: false })}
         />
 
+        {/* Header Section */}
         <div className="text-center mb-12">
           <div className="mb-6">
             <span className="text-6xl animate-bounce">🎯</span>
@@ -124,6 +130,7 @@ function PerfectPawtner() {
           </p>
         </div>
 
+        {/* Back Button */}
         <div className="mb-8">
           <button
             onClick={() => navigate('/adopter/dashboard')}
@@ -150,102 +157,107 @@ function PerfectPawtner() {
         ) : matches.length === 0 ? (
           <div className="text-center py-16">
             <div className="text-8xl text-gray-300 mb-6">🔍</div>
-            <h2 className="text-2xl font-semibold text-gray-600 mb-4">No matches found</h2>
+            <h2 className="text-2xl font-semibold text-gray-600 mb-4">No matches found 😢</h2>
             <p className="text-gray-500 mb-8 max-w-md mx-auto">
               We couldn't find any pets that match your current preferences. Try updating your preferences or browse all available pets.
             </p>
             <div className="space-x-4">
               <button
                 onClick={() => navigate('/adopter/profile')}
-                className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary/80 transition-colors"
+                className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-2xl font-medium hover:scale-105 transition-all duration-200 shadow-lg border-2 border-primary"
               >
-                Update Preferences
+                ✏️ Update Preferences
               </button>
               <button
                 onClick={() => navigate('/adopter/home')}
-                className="bg-gray-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-700 transition-colors"
+                className="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-6 py-3 rounded-2xl font-medium hover:scale-105 transition-all duration-200 shadow-lg border-2 border-gray-400"
               >
-                Browse All Pets
+                🐾 Browse All Pets
               </button>
             </div>
           </div>
         ) : (
           <>
             <div className="flex items-center justify-between mb-6">
-              <p className="text-gray-600">
-                Found {matches.length} perfect {matches.length === 1 ? 'match' : 'matches'} for you
-              </p>
+              <div className="bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl px-4 py-2 border-2 border-green-200">
+                <span className="text-emerald-600 font-bold">
+                  🎯 Found {matches.length} perfect {matches.length === 1 ? 'match' : 'matches'} for you
+                </span>
+              </div>
               <button
                 onClick={() => navigate('/adopter/home')}
-                className="text-primary hover:text-primary/80 font-medium"
+                className="bg-gradient-to-r from-blue-400 to-purple-500 text-white px-4 py-2 rounded-2xl font-medium hover:scale-105 transition-all duration-200 shadow-lg border-2 border-blue-300"
               >
-                Browse More Pets →
+                🐕 Browse More Pets →
               </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            
+            {/* Matches Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
               {matches.map((match) => {
                 const pet = match.pet || match;
                 return (
                 <div 
                   key={pet.id} 
-                  className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => navigate(`/adopter/pets/${pet.id}`)}
+                  className="bg-gradient-to-br from-white to-pink-50 rounded-3xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-110 hover:rotate-1 border-2 border-pink-200"
+                  onClick={() => navigate(`/pets/${pet.id}`)}
                 >
                   <div className="relative h-48 bg-gray-100 flex items-center justify-center">
                     {pet.primary_photo_url ? (
                       <img
                         src={getImageUrl(pet.primary_photo_url)}
                         alt={pet.name}
-                        className="w-full h-full object-contain"
-                        onError={(e) => {
-                          e.target.style.display = 'none'
-                          e.target.nextSibling.style.display = 'flex'
-                        }}
+                        className="w-full h-full object-cover"
                       />
-                    ) : null}
-                    <div 
-                      className="text-gray-400 text-6xl flex items-center justify-center w-full h-full"
-                      style={{ display: pet.primary_photo_url ? 'none' : 'flex' }}
-                    >
-                      🐾
-                    </div>
+                    ) : (
+                      <div className="text-gray-400 text-6xl">🐾</div>
+                    )}
                     
-                    <div className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-medium ${
+                    <div className={`absolute top-3 left-3 px-3 py-1 rounded-2xl text-xs font-bold ${
                       pet.adoption_status === 'AVAILABLE' || pet.adoption_status === 'available'
-                        ? 'bg-green-100 text-green-800'
+                        ? 'bg-gradient-to-r from-green-100 to-emerald-100 text-emerald-600 border-2 border-green-200'
                         : pet.adoption_status === 'PENDING' || pet.adoption_status === 'pending'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-gray-100 text-gray-800'
+                        ? 'bg-gradient-to-r from-yellow-100 to-orange-100 text-amber-600 border-2 border-yellow-200'
+                        : 'bg-gradient-to-r from-gray-100 to-gray-200 text-gray-600 border-2 border-gray-200'
                     }`}>
-                      {pet.adoption_status}
+                      {pet.adoption_status === 'AVAILABLE' || pet.adoption_status === 'available' ? '✨ Available!' : pet.adoption_status}
                     </div>
                   </div>
                   
-                  <div className="p-4">
-                    <div className="flex items-start justify-between mb-2">
-                      <h3 className="text-lg font-semibold text-gray-800">{pet.name}</h3>
-                      <span className="text-sm text-gray-500 capitalize">{pet.pet_type?.toLowerCase()}</span>
+                  <div className="p-5">
+                    <div className="text-center mb-3">
+                      <h3 className="text-xl font-bold text-gray-800 mb-1">
+                        {pet.name} <span className="text-2xl">
+                          {pet.pet_type === 'dog' ? '🐕' : pet.pet_type === 'cat' ? '🐱' : pet.pet_type === 'bird' ? '🐦' : pet.pet_type === 'rabbit' ? '🐰' : '🐾'}
+                        </span>
+                      </h3>
+                      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl px-3 py-1 inline-block border border-primary/20">
+                        <span className="text-sm text-primary font-bold capitalize">{pet.pet_type?.toLowerCase()}</span>
+                      </div>
                     </div>
                     
-                    <p className="text-gray-600 text-sm mb-3">
-                      {pet.breed && `${pet.breed} • `}
-                      {formatAge(pet.age_years, pet.age_months)} • {pet.size}
-                    </p>
+                    <div className="text-center mb-4">
+                      <p className="text-gray-600 text-sm font-medium">
+                        {pet.breed && `${pet.breed} • `}
+                        {formatAge(pet.age_years, pet.age_months)} • 
+                        {pet.size} size
+                      </p>
+                    </div>
                     
                     <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold text-primary">
-                        {pet.adoption_fee && Number(pet.adoption_fee) > 0 
-                          ? `PKR ${Number(pet.adoption_fee)}` 
-                          : 'Free'}
-                      </span>
+                      <div className="bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl px-4 py-2 border-2 border-green-200">
+                        <span className="text-lg font-bold text-emerald-600">
+                          {pet.adoption_fee && Number(pet.adoption_fee) > 0 ? `PKR ${Number(pet.adoption_fee)}` : 'FREE! 🎉'}
+                        </span>
+                      </div>
                       <button 
                         onClick={(e) => {
                           e.stopPropagation()
-                          navigate(`/adopter/pets/${pet.id}`)
+                          navigate(`/pets/${pet.id}`)
                         }}
-                        className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-primary/80 transition-colors"
+                        className="bg-gradient-to-r from-primary to-secondary text-white px-4 py-2 rounded-2xl text-sm font-bold hover:scale-105 transition-all duration-200 shadow-lg border-2 border-primary"
                       >
-                        View Details
+                        👀 View Details
                       </button>
                     </div>
                   </div>
@@ -254,29 +266,27 @@ function PerfectPawtner() {
               })}
             </div>
 
-            <div className="mt-12 text-center">
-              <div className="bg-white rounded-2xl shadow-sm p-8">
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Want to see more options?</h3>
-                <p className="text-gray-600 mb-6">
-                  These are your best matches, but there might be other great pets waiting for you too!
-                </p>
-                <div className="space-x-4">
-                  <button
-                    onClick={() => navigate('/adopter/home')}
-                    className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-primary/80 transition-colors"
-                  >
-                    Browse All Pets
-                  </button>
-                  <button
-                    onClick={() => navigate('/adopter/profile')}
-                    className="bg-secondary text-white px-6 py-3 rounded-lg font-medium hover:bg-secondary/80 transition-colors"
-                  >
-                    Update Preferences
-                  </button>
-                </div>
+            {/* Bottom CTA */}
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl p-8 mb-8 shadow-xl border-2 border-blue-200 text-center">
+              <h3 className="text-xl font-bold text-gray-800 mb-4">Want to see more options? 🧐</h3>
+              <p className="text-gray-600 mb-6">
+                These are your best matches, but there might be other great pets waiting for you too!
+              </p>
+              <div className="space-x-4">
+                <button
+                  onClick={() => navigate('/adopter/home')}
+                  className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-2xl font-bold hover:scale-105 transition-all duration-200 shadow-lg border-2 border-primary"
+                >
+                  🐕 Browse All Pets
+                </button>
+                <button
+                  onClick={() => navigate('/adopter/profile')}
+                  className="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-6 py-3 rounded-2xl font-bold hover:scale-105 transition-all duration-200 shadow-lg border-2 border-gray-400"
+                >
+                  ✏️ Update Preferences
+                </button>
               </div>
             </div>
-            
           </>
         )}
       </div>

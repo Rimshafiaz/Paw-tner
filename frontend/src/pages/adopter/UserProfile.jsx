@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import NotificationBanner from '../../components/NotificationBanner'
+import adopterPawtnerImage from '../../assets/adopter paw-tner.jpg'
 
 function UserProfile() {
   const navigate = useNavigate()
@@ -141,7 +142,7 @@ function UserProfile() {
       })
 
       if (response.ok) {
-        showNotification('Preferences updated successfully!', 'success')
+        showNotification('Preferences updated successfully! 🎉', 'success')
         setTimeout(() => {
           navigate('/adopter/dashboard')
         }, 2000)
@@ -163,38 +164,74 @@ function UserProfile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{
+        backgroundImage: `linear-gradient(rgba(255, 248, 240, 0.85), rgba(240, 255, 248, 0.85)), url(${adopterPawtnerImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg">Loading your preferences...</p>
+          <p className="text-gray-600 text-lg font-medium">Loading your preferences... ✨</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div 
+      className="min-h-screen relative"
+      style={{
+        backgroundImage: `linear-gradient(rgba(255, 248, 240, 0.85), rgba(240, 255, 248, 0.85)), url(${adopterPawtnerImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      <div className="max-w-4xl mx-auto px-4 py-8">
         <NotificationBanner 
           notification={notification} 
           onClose={() => setNotification({ message: '', type: '', show: false })}
         />
 
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold from-[#FF8C42] to-[#FE8B02] text-transparent bg-clip-text bg-gradient-to-br">Your Pet Preferences</h1>
-          <p className="text-gray-600 mt-2">
-            Help us find the perfect pet for you by sharing your preferences
+        {/* Header Section */}
+        <div className="text-center mb-12">
+          <div className="mb-6">
+            <span className="text-6xl animate-bounce">🎯</span>
+            <span className="text-6xl animate-pulse mx-4">⚙️</span>
+            <span className="text-6xl animate-bounce">✨</span>
+          </div>
+          <h1 className="text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] mb-4 drop-shadow-lg animate-pulse">
+            Your Pet Preferences
+          </h1>
+          <p className="text-xl text-gray-700 mb-8 font-medium">
+            🌟 Help us find the perfect pet for you by sharing your preferences 🌟
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-8">
+        {/* Back Button */}
+        <div className="mb-8">
+          <button
+            onClick={() => navigate('/adopter/dashboard')}
+            className="bg-gradient-to-r from-purple-400 to-pink-500 text-white px-6 py-3 rounded-2xl font-bold hover:scale-105 transition-all duration-200 flex items-center shadow-lg border-2 border-purple-300"
+          >
+            🏠 ← Back to Dashboard
+          </button>
+        </div>
+
+        <div className="bg-gradient-to-br from-white to-pink-50 rounded-3xl shadow-xl p-8 border-2 border-pink-200">
           <form onSubmit={handleSubmit} className="space-y-8">
             
-            <div className="border-b border-gray-200 pb-8">
-              <h2 className="text-xl font-semibold text-gray-800 mb-6">Pet Preferences</h2>
+            {/* Pet Preferences Section */}
+            <div className="border-b border-pink-200 pb-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <span className="mr-3">🐕</span>
+                Pet Preferences
+              </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-xl">🏷️</span>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Preferred Pet Type
                   </label>
@@ -202,18 +239,19 @@ function UserProfile() {
                     name="preferred_pet_type"
                     value={formData.preferred_pet_type}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-colors"
+                    className="w-full pl-12 pr-4 py-3 rounded-2xl border-2 border-pink-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-white shadow-sm"
                   >
-                    <option value="">Any pet type</option>
-                    <option value="dog">Dog</option>
-                    <option value="cat">Cat</option>
-                    <option value="bird">Bird</option>
-                    <option value="rabbit">Rabbit</option>
-                    <option value="other">Other</option>
+                    <option value="">🌟 Any pet type</option>
+                    <option value="dog">🐕 Dog</option>
+                    <option value="cat">🐱 Cat</option>
+                    <option value="bird">🐦 Bird</option>
+                    <option value="rabbit">🐰 Rabbit</option>
+                    <option value="other">🦎 Other</option>
                   </select>
                 </div>
 
-                <div>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-xl">📏</span>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Preferred Size
                   </label>
@@ -221,17 +259,18 @@ function UserProfile() {
                     name="preferred_pet_size"
                     value={formData.preferred_pet_size}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-colors"
+                    className="w-full pl-12 pr-4 py-3 rounded-2xl border-2 border-green-200 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary bg-white shadow-sm"
                   >
-                    <option value="">Any size</option>
-                    <option value="small">Small</option>
-                    <option value="medium">Medium</option>
-                    <option value="large">Large</option>
-                    <option value="extra_large">Extra Large</option>
+                    <option value="">📏 Any size</option>
+                    <option value="small">🐁 Small</option>
+                    <option value="medium">🐕 Medium</option>
+                    <option value="large">🐕‍🦺 Large</option>
+                    <option value="extra_large">🐘 Extra Large</option>
                   </select>
                 </div>
 
-                <div>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-xl">🎂</span>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Min Age (years)
                   </label>
@@ -242,12 +281,13 @@ function UserProfile() {
                     onChange={handleChange}
                     min="0"
                     max="20"
-                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-colors"
+                    className="w-full pl-12 pr-4 py-3 rounded-2xl border-2 border-yellow-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-white shadow-sm"
                     placeholder="Any age"
                   />
                 </div>
 
-                <div>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-xl">🎈</span>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Max Age (years)
                   </label>
@@ -258,12 +298,13 @@ function UserProfile() {
                     onChange={handleChange}
                     min="0"
                     max="20"
-                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-colors"
+                    className="w-full pl-12 pr-4 py-3 rounded-2xl border-2 border-yellow-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-white shadow-sm"
                     placeholder="Any age"
                   />
                 </div>
 
-                <div>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-xl">💰</span>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Max Adoption Fee (PKR)
                   </label>
@@ -274,12 +315,13 @@ function UserProfile() {
                     onChange={handleChange}
                     min="0"
                     step="100"
-                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-colors"
+                    className="w-full pl-12 pr-4 py-3 rounded-2xl border-2 border-green-200 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary bg-white shadow-sm"
                     placeholder="No limit"
                   />
                 </div>
 
-                <div>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-xl">⚡</span>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Activity Level
                   </label>
@@ -287,23 +329,28 @@ function UserProfile() {
                     name="activity_level"
                     value={formData.activity_level}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-colors"
+                    className="w-full pl-12 pr-4 py-3 rounded-2xl border-2 border-blue-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-white shadow-sm"
                   >
-                    <option value="">Any activity level</option>
-                    <option value="low">Low</option>
-                    <option value="moderate">Moderate</option>
-                    <option value="high">High</option>
-                    <option value="very_high">Very High</option>
+                    <option value="">⚡ Any activity level</option>
+                    <option value="low">😴 Low</option>
+                    <option value="moderate">🚶 Moderate</option>
+                    <option value="high">🏃 High</option>
+                    <option value="very_high">⚡ Very High</option>
                   </select>
                 </div>
               </div>
             </div>
 
-            <div className="border-b border-gray-200 pb-8">
-              <h2 className="text-xl font-semibold text-gray-800 mb-6">Lifestyle & Housing</h2>
+            {/* Lifestyle & Housing Section */}
+            <div className="border-b border-pink-200 pb-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <span className="mr-3">🏠</span>
+                Lifestyle & Housing
+              </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-xl">🏡</span>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Housing Type
                   </label>
@@ -311,16 +358,17 @@ function UserProfile() {
                     name="house_type"
                     value={formData.house_type}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-colors"
+                    className="w-full pl-12 pr-4 py-3 rounded-2xl border-2 border-purple-200 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary bg-white shadow-sm"
                   >
-                    <option value="">Select housing type</option>
-                    <option value="apartment">Flat/Apartment</option>
-                    <option value="house">House</option>
-                    <option value="farm">Farmhouse</option>
+                    <option value="">🏡 Select housing type</option>
+                    <option value="apartment">🏢 Flat/Apartment</option>
+                    <option value="house">🏠 House</option>
+                    <option value="farm">🌾 Farmhouse</option>
                   </select>
                 </div>
 
-                <div>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-xl">🎓</span>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Experience Level
                   </label>
@@ -328,64 +376,69 @@ function UserProfile() {
                     name="experience_level"
                     value={formData.experience_level}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-colors"
+                    className="w-full pl-12 pr-4 py-3 rounded-2xl border-2 border-orange-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-white shadow-sm"
                   >
-                    <option value="">Select experience level</option>
-                    <option value="first_time">First-time pet owner</option>
-                    <option value="beginner">Some experience with pets</option>
-                    <option value="experienced">Very experienced pet owner</option>
-                    <option value="professional">Professional/Breeder experience</option>
+                    <option value="">🎓 Select experience level</option>
+                    <option value="first_time">👶 First-time pet owner</option>
+                    <option value="beginner">🙂 Some experience with pets</option>
+                    <option value="experienced">👍 Very experienced pet owner</option>
+                    <option value="professional">🏆 Professional/Breeder experience</option>
                   </select>
                 </div>
               </div>
 
               <div className="mt-6 space-y-4">
-                <div className="flex items-center">
+                <div className="flex items-center bg-gradient-to-r from-pink-50 to-red-50 rounded-2xl p-4 border-2 border-pink-200">
                   <input
                     type="checkbox"
                     name="has_children"
                     checked={formData.has_children}
                     onChange={handleChange}
-                    className="h-5 w-5 text-primary accent-primary border-gray-300 rounded focus:ring-primary focus:ring-2"
+                    className="h-6 w-6 text-primary accent-primary border-gray-300 rounded-full focus:ring-primary focus:ring-2"
                   />
                   <label className="ml-3 text-sm font-medium text-gray-700">
-                    I have children at home
+                    👶 I have children at home
                   </label>
                 </div>
 
-                <div className="flex items-center">
+                <div className="flex items-center bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-4 border-2 border-green-200">
                   <input
                     type="checkbox"
                     name="has_yard"
                     checked={formData.has_yard}
                     onChange={handleChange}
-                    className="h-5 w-5 text-primary border-gray-300 rounded accent-primary focus:ring-primary focus:ring-2"
+                    className="h-6 w-6 text-primary accent-primary border-gray-300 rounded-full focus:ring-primary focus:ring-2"
                   />
                   <label className="ml-3 text-sm font-medium text-gray-700">
-                    I have a yard or outdoor space
+                    🌳 I have a yard or outdoor space
                   </label>
                 </div>
 
-                <div className="flex items-center">
+                <div className="flex items-center bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-4 border-2 border-blue-200">
                   <input
                     type="checkbox"
                     name="has_other_pets"
                     checked={formData.has_other_pets}
                     onChange={handleChange}
-                    className="h-5 w-5 text-primary accent-secondary border-gray-300 rounded focus:ring-primary focus:ring-2"
+                    className="h-6 w-6 text-primary accent-primary border-gray-300 rounded-full focus:ring-primary focus:ring-2"
                   />
                   <label className="ml-3 text-sm font-medium text-gray-700">
-                    I already have other pets
+                    🐾 I already have other pets
                   </label>
                 </div>
               </div>
             </div>
 
-            <div className="border-b border-gray-200 pb-8">
-              <h2 className="text-xl font-semibold text-gray-800 mb-6">Location</h2>
+            {/* Location Section */}
+            <div className="border-b border-pink-200 pb-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <span className="mr-3">📍</span>
+                Location
+              </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-xl">🏙️</span>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     City
                   </label>
@@ -394,12 +447,13 @@ function UserProfile() {
                     name="city"
                     value={formData.city}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-colors"
+                    className="w-full pl-12 pr-4 py-3 rounded-2xl border-2 border-purple-200 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary bg-white shadow-sm"
                     placeholder="Your city"
                   />
                 </div>
 
-                <div>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-xl">🗺️</span>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Province
                   </label>
@@ -407,20 +461,21 @@ function UserProfile() {
                     name="state"
                     value={formData.state}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-colors"
+                    className="w-full pl-12 pr-4 py-3 rounded-2xl border-2 border-orange-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-white shadow-sm"
                   >
-                    <option value="">Select province</option>
-                    <option value="Punjab">Punjab</option>
-                    <option value="Sindh">Sindh</option>
-                    <option value="Khyber Pakhtunkhwa">Khyber Pakhtunkhwa</option>
-                    <option value="Balochistan">Balochistan</option>
-                    <option value="Gilgit-Baltistan">Gilgit-Baltistan</option>
-                    <option value="Azad Kashmir">Azad Kashmir</option>
-                    <option value="Islamabad Capital Territory">Islamabad Capital Territory</option>
+                    <option value="">🗺️ Select province</option>
+                    <option value="Punjab">🏛️ Punjab</option>
+                    <option value="Sindh">🏖️ Sindh</option>
+                    <option value="Khyber Pakhtunkhwa">🏔️ Khyber Pakhtunkhwa</option>
+                    <option value="Balochistan">🏜️ Balochistan</option>
+                    <option value="Gilgit-Baltistan">⛰️ Gilgit-Baltistan</option>
+                    <option value="Azad Kashmir">🌲 Azad Kashmir</option>
+                    <option value="Islamabad Capital Territory">🏛️ Islamabad</option>
                   </select>
                 </div>
 
-                <div>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-xl">📮</span>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Postal Code
                   </label>
@@ -429,32 +484,33 @@ function UserProfile() {
                     name="zip_code"
                     value={formData.zip_code}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-colors"
+                    className="w-full pl-12 pr-4 py-3 rounded-2xl border-2 border-blue-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-white shadow-sm"
                     placeholder="54000"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
+            {/* Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-pink-200">
               <button
                 type="button"
                 onClick={() => navigate('/adopter/dashboard')}
-                className="w-full sm:w-auto px-6 py-3 border border-gray-300 text-gray-700 rounded-xl font-medium hover:bg-gray-300/80 transition-colors"
+                className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-gray-400 to-gray-500 text-white rounded-2xl font-bold hover:scale-105 transition-all duration-200 flex items-center justify-center shadow-lg border-2 border-gray-300"
               >
-                Cancel
+                ❌ Cancel
               </button>
               
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full sm:w-auto px-6 py-3 rounded-xl font-medium transition-colors ${
+                className={`w-full sm:w-auto px-6 py-3 rounded-2xl font-bold transition-all duration-200 flex items-center justify-center shadow-lg border-2 ${
                   isSubmitting 
-                    ? 'bg-gray-400 cursor-not-allowed opacity-75' 
-                    : 'bg-primary text-white hover:bg-primary/80'
+                    ? 'bg-gray-400 cursor-not-allowed opacity-75 border-gray-300' 
+                    : 'bg-gradient-to-r from-primary to-secondary text-white hover:scale-105 border-primary'
                 }`}
               >
-                {isSubmitting ? 'Saving Preferences' : 'Save Preferences'}
+                {isSubmitting ? '💾 Saving Preferences...' : '💾 Save Preferences'}
               </button>
             </div>
           </form>
