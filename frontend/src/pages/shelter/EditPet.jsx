@@ -175,7 +175,6 @@ function EditPet() {
         const updatedPet = await response.json()
         showNotification(`${formData.name} has been updated successfully!`, 'success')
         
-        // Refresh the pet data to show the updated values
         await fetchPetData()
         
         setTimeout(() => {

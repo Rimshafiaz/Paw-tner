@@ -238,7 +238,6 @@ class User(BaseModel):
     extended_preferences_complete: bool = False
     created_at: datetime
     
-    # Include all preferences if they exist
     preferred_pet_type: Optional[PetType] = None
     preferred_age_min: Optional[int] = None
     preferred_age_max: Optional[int] = None

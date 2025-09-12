@@ -6,7 +6,6 @@ function AdopterDashboard() {
   const { currentUser } = useAuth()
   const navigate = useNavigate()
   
-  // Get current date for a personalized greeting
   const currentDate = new Date().toLocaleDateString('en-US', { 
     weekday: 'long', 
     year: 'numeric', 
@@ -14,7 +13,6 @@ function AdopterDashboard() {
     day: 'numeric' 
   })
   
-  // Pet-related quotes that rotate or use a fixed one
   const petQuotes = [
     "Saving one pet won't change the world, but it will change the world for that one pet.",
     "Pets leave paw prints forever on our hearts.",
@@ -33,7 +31,6 @@ function AdopterDashboard() {
       }}
     >
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Enhanced Header Section */}
         <div className="text-center mb-12">
           <div className="mb-6">
             <span className="text-6xl animate-bounce">🏠</span>
@@ -53,9 +50,7 @@ function AdopterDashboard() {
           </div>
         </div>
 
-        {/* Dashboard Cards Grid - Enhanced */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          {/* Browse Pets Card */}
           <div 
             className="bg-gradient-to-br from-white to-pink-50 rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 border-2 border-pink-200 group relative overflow-hidden"
             onClick={() => navigate('/adopter/home')}
@@ -81,7 +76,6 @@ function AdopterDashboard() {
             </button>
           </div>
 
-          {/* Favorites Card */}
           <div 
             className="bg-gradient-to-br from-white to-blue-50 rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 border-2 border-blue-200 group relative overflow-hidden"
             onClick={() => navigate('/adopter/favorites')}
@@ -107,7 +101,6 @@ function AdopterDashboard() {
             </button>
           </div>
 
-          {/* Perfect Paw-tner Card */}
           <div 
             className="bg-gradient-to-br from-white to-green-50 rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 border-2 border-green-200 group relative overflow-hidden"
             onClick={() => navigate('/adopter/perfect-pawtner')}
@@ -133,7 +126,6 @@ function AdopterDashboard() {
             </button>
           </div>
 
-          {/* Preferences Card */}
           <div 
             className="bg-gradient-to-br from-white to-yellow-50 rounded-3xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-105 border-2 border-yellow-200 group relative overflow-hidden"
             onClick={() => navigate('/adopter/profile')}
@@ -160,7 +152,6 @@ function AdopterDashboard() {
           </div>
         </div>
 
-        {/* Helpful Tips Section */}
         <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl p-8 mb-8 shadow-xl border-2 border-blue-200">
           <h2 className="text-2xl font-bold text-center text-gray-800 mb-6 flex items-center justify-center">
             <span className="mr-2">💡</span>
@@ -191,7 +182,6 @@ function AdopterDashboard() {
           </div>
         </div>
 
-        {/* Call to Action Section */}
         <div className="bg-gradient-to-r from-pink-50 to-red-50 rounded-3xl p-8 text-center border-2 border-pink-200 shadow-xl">
           <span className="text-4xl mb-4 block">🐾</span>
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Ready to Meet Your New Best Friend?</h2>

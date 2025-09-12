@@ -6,11 +6,11 @@ function AccountTypeSelector({ onSelect }) {
         <p className="text-lg text-gray-600 max-w-2xl mx-auto">Choose how you'd like to get started with Paw-tner.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-4xl mx-auto px-4">
         
         <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer border border-gray-100"
              onClick={() => onSelect('adopter')}>
-          <div className="p-8 text-center">
+          <div className="p-4 md:p-8 text-center">
             <div className="bg-primary/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
               <span className="text-3xl">❤️</span>
             </div>
@@ -26,7 +26,7 @@ function AccountTypeSelector({ onSelect }) {
 
         <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer border border-gray-100"
              onClick={() => onSelect('shelter')}>
-          <div className="p-8 text-center">
+          <div className="p-4 md:p-8 text-center">
             <div className="bg-secondary/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
               <span className="text-3xl">🏠</span>
             </div>

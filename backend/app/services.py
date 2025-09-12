@@ -351,7 +351,6 @@ class MatchingService:
         
         score = 50.0  
         
-        # If user has a specific pet type preference, only match that type
         if user.preferred_pet_type and user.preferred_pet_type != pet.pet_type:
             return 0.0
         

@@ -72,12 +72,11 @@ function Navbar() {
           <div className="md:hidden">
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-gray-600 hover:text-gray-900"
+              className="bg-gradient-to-r from-pink-400 to-purple-500 text-white p-2 rounded-2xl hover:scale-105 transition-all duration-200 shadow-lg border-2 border-pink-300"
             >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
-                      d={isMobileMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
-              </svg>
+              <span className="text-lg">
+                {isMobileMenuOpen ? '✖️' : '📱'}
+              </span>
             </button>
           </div>
         </div>
@@ -85,56 +84,69 @@ function Navbar() {
         
         {isMobileMenuOpen && (
           <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-gray-100">
+            <div className="px-4 pt-4 pb-6 space-y-3 bg-gradient-to-br from-pink-50 to-purple-50 border-t-2 border-pink-200 rounded-b-3xl shadow-xl">
               <Link 
                 to="/about" 
-                className="block px-3 py-2 text-gray-600 hover:bg-gradient-to-r hover:from-[#FF5733] hover:to-[#00FFEA] hover:bg-clip-text hover:text-transparent font-medium transition-all duration-200"
+                className="block px-4 py-3 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-2xl text-blue-600 font-bold hover:scale-105 transition-all duration-200 shadow-md border-2 border-blue-200"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                About
+                📖 About
               </Link>
               <Link 
-                to="/contact" 
-                className="block px-3 py-2 text-gray-600 hover:bg-gradient-to-r hover:from-[#FF5733] hover:to-[#00FFEA] hover:bg-clip-text hover:text-transparent font-medium transition-all duration-200"
+                to={currentUser?.userType==='adopter'? 'adopter/home':'/'} 
+                className="block px-4 py-3 bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl text-green-600 font-bold hover:scale-105 transition-all duration-200 shadow-md border-2 border-green-200"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Contact
+                🏠 Home
               </Link>
               
               {isLoggedIn ? (
                 <>
                   <Link 
-                    to={currentUser?.userType === 'shelter' ? '/shelter/dashboard' : '/adopter/dashboard'}
-                    className="block px-3 py-2 text-gray-600 hover:bg-gradient-to-r hover:from-[#FF5733] hover:to-[#00FFEA] hover:bg-clip-text hover:text-transparent font-medium transition-all duration-200"
+                    to={
+                      currentUser?.userType === 'shelter' ? '/shelter/dashboard' 
+                      : currentUser?.userType === 'admin' ? '/admin/dashboard'
+                      : '/adopter/dashboard'
+                    }
+                    className="block px-4 py-3 bg-gradient-to-r from-purple-100 to-pink-100 rounded-2xl text-purple-600 font-bold hover:scale-105 transition-all duration-200 shadow-md border-2 border-purple-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Dashboard
+                    📊 Dashboard
                   </Link>
+                  <div className="px-4 py-2 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-2xl border-2 border-yellow-200">
+                    <span className={
+                      currentUser.userType === 'shelter' ? "text-secondary font-bold text-sm" 
+                      : currentUser.userType === 'admin' ? "text-purple-600 font-bold text-sm"
+                      : "text-primary font-bold text-sm"
+                    }>
+                      👋 Welcome {currentUser?.name || currentUser?.email || 'User'}
+                    </span>
+                  </div>
                   <button 
                     onClick={() => {
                       logout()
                       setIsMobileMenuOpen(false)
                     }}
-                    className="block w-full text-left px-3 py-2 text-gray-600 hover:text-gray-900 font-medium"
+                    className="block w-full px-4 py-3 bg-gradient-to-r from-red-100 to-pink-100 rounded-2xl text-red-600 font-bold hover:scale-105 transition-all duration-200 shadow-md border-2 border-red-200"
                   >
-                    Logout
+                    🚪 Logout
                   </button>
                 </>
               ) : (
                 <>
                   <Link 
                     to="/login" 
-                    className="block px-3 py-2 text-gray-600 hover:bg-gradient-to-r hover:from-[#FF5733] hover:to-[#00FFEA] hover:bg-clip-text hover:text-transparent font-medium transition-all duration-200"
+                    className="block px-4 py-3 bg-gradient-to-r from-blue-100 to-purple-100 rounded-2xl text-blue-600 font-bold hover:scale-105 transition-all duration-200 shadow-md border-2 border-blue-200"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Log In
+                    🔑 Log In
                   </Link>
                   <Link 
                     to="/register" 
-                    className="block px-3 py-2 bg-gradient-to-r from-[#FF5733] to-[#00FFEA] text-white rounded-lg font-medium mx-3 text-center hover:shadow-lg transition-all duration-200"
+                    className="block px-4 py-3 bg-gradient-to-r from-orange-400 to-pink-500 text-white rounded-2xl font-bold text-center hover:scale-105 transition-all duration-200 shadow-lg border-2 border-orange-300"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
-                    Sign Up
+                    ✨ Sign Up
                   </Link>
                 </>
               )}

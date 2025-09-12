@@ -12,6 +12,7 @@ function Favorites() {
   const [loading, setLoading] = useState(true)
   const [notification, setNotification] = useState({ message: '', type: '', show: false })
   const [removingFavorite, setRemovingFavorite] = useState({})
+  const [mobileViewMode, setMobileViewMode] = useState('double')
 
   const showNotification = (message, type) => {
     setNotification({ message, type, show: true })
@@ -24,7 +25,6 @@ function Favorites() {
     fetchFavorites()
   }, [currentUser])
 
-  // Refetch favorites when page becomes visible
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
@@ -123,8 +123,9 @@ function Favorites() {
         backgroundAttachment: 'fixed'
       }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg font-medium">Loading your favorites... 💖</p>
+          <div className="animate-bounce text-6xl mb-6">💖</div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg font-medium animate-pulse">Loading your favorites... ✨</p>
         </div>
       </div>
     )
@@ -146,7 +147,6 @@ function Favorites() {
           onClose={() => setNotification({ message: '', type: '', show: false })}
         />
 
-        {/* Header Section */}
         <div className="text-center mb-12">
           <div className="mb-6">
             <span className="text-6xl animate-bounce">💖</span>
@@ -159,16 +159,6 @@ function Favorites() {
           <p className="text-xl text-gray-700 mb-8 font-medium">
             🌟 Pets you've saved for future consideration 🌟
           </p>
-        </div>
-
-        {/* Back Button */}
-        <div className="mb-8">
-          <button
-            onClick={() => navigate('/adopter/dashboard')}
-            className="bg-gradient-to-r from-purple-400 to-pink-500 text-white px-6 py-3 rounded-2xl font-bold hover:scale-105 transition-all duration-200 flex items-center shadow-lg border-2 border-purple-300"
-          >
-            🏠 ← Back to Dashboard
-          </button>
         </div>
 
         {favorites.length === 0 ? (
@@ -195,27 +185,44 @@ function Favorites() {
           </div>
         ) : (
           <>
-            <div className="flex items-center justify-between mb-6">
-              <div className="bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl px-4 py-2 border-2 border-green-200">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+              <button
+                onClick={() => navigate('/adopter/dashboard')}
+                className="bg-gradient-to-r from-purple-400 to-pink-500 text-white px-6 py-3 rounded-2xl font-bold hover:scale-105 transition-all duration-200 flex items-center shadow-lg border-2 border-purple-300"
+              >
+                🏠 ← Back to Dashboard
+              </button>
+              <div className="flex items-center gap-2 md:hidden">
+                <div className="bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl px-3 py-2 border-2 border-green-200">
+                  <span className="text-emerald-600 font-bold text-sm">
+                    💖 {favorites.length} pets
+                  </span>
+                </div>
+                <button
+                  onClick={() => setMobileViewMode(mobileViewMode === 'single' ? 'double' : 'single')}
+                  className="bg-gradient-to-r from-orange-400 to-yellow-500 text-white px-3 py-2 rounded-2xl font-bold hover:scale-105 transition-all duration-200 shadow-lg border-2 border-orange-300 text-xs"
+                >
+                  {mobileViewMode === 'single' ? '🔄 2 Cols' : '🔄 1 Col'}
+                </button>
+              </div>
+              <div className="hidden md:block bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl px-4 py-2 border-2 border-green-200">
                 <span className="text-emerald-600 font-bold">
                   💖 You have {favorites.length} favorite {favorites.length === 1 ? 'pet' : 'pets'}
                 </span>
               </div>
               <button
                 onClick={() => navigate('/adopter/home')}
-                className="bg-gradient-to-r from-blue-400 to-purple-500 text-white px-4 py-2 rounded-2xl font-medium hover:scale-105 transition-all duration-200 shadow-lg border-2 border-blue-300"
+                className="bg-gradient-to-r from-blue-400 to-purple-500 text-white px-6 py-3 rounded-2xl font-bold hover:scale-105 transition-all duration-200 shadow-lg border-2 border-blue-300"
               >
                 🐕 Browse More Pets →
               </button>
             </div>
             
-            {/* Favorites Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+            <div className={`grid ${mobileViewMode === 'single' ? 'grid-cols-1' : 'grid-cols-2'} md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-8 px-6 md:px-0`}>
               {favorites.map((favorite) => {
                 const pet = favorite.pet || favorite
                 const petId = favorite.pet_id || favorite.id || pet.id
                 
-                // Skip rendering if no valid pet ID
                 if (!petId) {
                   console.warn('Favorite missing pet ID:', favorite)
                   return null
@@ -224,18 +231,18 @@ function Favorites() {
                 return (
                   <div 
                     key={petId} 
-                    className="bg-gradient-to-br from-white to-pink-50 rounded-3xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-110 hover:rotate-1 border-2 border-pink-200"
+                    className="bg-gradient-to-br from-white to-pink-50 rounded-2xl md:rounded-3xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-110 hover:rotate-1 border-2 border-pink-200"
                     onClick={() => navigate(`/pets/${petId}`)}
                   >
-                    <div className="relative h-48 bg-gray-100 flex items-center justify-center">
+                    <div className="relative h-32 md:h-48 bg-gray-100 flex items-center justify-center">
                       {pet.primary_photo_url ? (
                         <img
                           src={getImageUrl(pet.primary_photo_url)}
-                          alt={pet.name}
-                          className="w-full h-full object-cover"
+                          alt={`Photo of ${pet.name}, a ${pet.pet_type}`}
+                          className="w-full h-full object-contain md:object-cover"
                         />
                       ) : (
-                        <div className="text-gray-400 text-6xl">🐾</div>
+                        <div className="text-gray-400 text-4xl md:text-6xl">🐾</div>
                       )}
                       
                       <button
@@ -246,6 +253,7 @@ function Favorites() {
                         disabled={removingFavorite[petId]}
                         className="absolute top-3 right-3 w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-all duration-200 transform hover:scale-110 bg-gradient-to-r from-red-400 to-pink-500 text-white hover:from-red-500 hover:to-pink-600 border-2 border-red-300"
                         title="Remove from favorites"
+                        aria-label={`Remove ${pet.name} from favorites`}
                       >
                         <span className="text-xl animate-pulse">
                           {removingFavorite[petId] ? '...' : '💔'}
@@ -263,10 +271,10 @@ function Favorites() {
                       </div>
                     </div>
                     
-                    <div className="p-5">
-                      <div className="text-center mb-3">
-                        <h3 className="text-xl font-bold text-gray-800 mb-1">
-                          {pet.name} <span className="text-2xl">
+                    <div className={`${mobileViewMode === 'double' ? 'p-2' : 'p-3'} md:p-5`}>
+                      <div className="text-center mb-2 md:mb-3">
+                        <h3 className={`${mobileViewMode === 'double' ? 'text-sm' : 'text-base'} md:text-xl font-bold mb-1`}>
+                          <span className="text-orange-500">Meet {pet.name}</span> <span className="text-xl md:text-2xl">
                             {pet.pet_type === 'dog' ? '🐕' : pet.pet_type === 'cat' ? '🐱' : pet.pet_type === 'bird' ? '🐦' : pet.pet_type === 'rabbit' ? '🐰' : '🐾'}
                           </span>
                         </h3>
@@ -275,15 +283,15 @@ function Favorites() {
                         </div>
                       </div>
                       
-                      <div className="text-center mb-4">
-                        <p className="text-gray-600 text-sm font-medium">
+                      <div className="text-center mb-2 md:mb-4">
+                        <p className="text-gray-600 text-xs md:text-sm font-medium">
                           {pet.breed && `${pet.breed} • `}
                           {formatAge(pet.age_years, pet.age_months)} • 
                           {pet.size} size
                         </p>
                       </div>
 
-                      {favorite.created_at && (
+                      {favorite.created_at && mobileViewMode === 'single' && (
                         <div className="text-center mb-4">
                           <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl px-3 py-1 inline-block border-2 border-blue-200">
                             <span className="text-xs text-blue-600 font-medium">
@@ -293,9 +301,9 @@ function Favorites() {
                         </div>
                       )}
                       
-                      <div className="flex items-center justify-between">
-                        <div className="bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl px-4 py-2 border-2 border-green-200">
-                          <span className="text-lg font-bold text-emerald-600">
+                      <div className={`flex items-center justify-between ${mobileViewMode === 'double' ? 'gap-1' : 'gap-2'}`}>
+                        <div className={`bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl ${mobileViewMode === 'double' ? 'px-1 py-1' : 'px-2 py-1'} md:px-3 md:py-2 border-2 border-green-200`}>
+                          <span className={`${mobileViewMode === 'double' ? 'text-xs' : 'text-sm'} md:text-lg font-bold text-emerald-600`}>
                             {pet.adoption_fee && Number(pet.adoption_fee) > 0 ? `PKR ${Number(pet.adoption_fee)}` : 'FREE! 🎉'}
                           </span>
                         </div>
@@ -304,9 +312,10 @@ function Favorites() {
                             e.stopPropagation()
                             navigate(`/pets/${petId}`)
                           }}
-                          className="bg-gradient-to-r from-primary to-secondary text-white px-4 py-2 rounded-2xl text-sm font-bold hover:scale-105 transition-all duration-200 shadow-lg border-2 border-primary"
+                          className={`bg-gradient-to-r from-primary to-secondary text-white ${mobileViewMode === 'double' ? 'px-2 py-1 text-xs' : 'px-4 py-2 text-sm'} md:px-6 md:py-3 md:text-sm rounded-2xl font-bold hover:scale-105 transition-all duration-200 shadow-lg border-2 border-primary`}
+                          aria-label={`View details for ${pet.name}`}
                         >
-                          👀 View Details
+                          👀 {mobileViewMode === 'double' ? 'View' : 'View Details'}
                         </button>
                       </div>
                     </div>
@@ -315,7 +324,6 @@ function Favorites() {
               })}
             </div>
 
-            {/* Bottom CTA */}
             <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl p-8 mb-8 shadow-xl border-2 border-blue-200 text-center">
               <h3 className="text-xl font-bold text-gray-800 mb-4">Ready to find more? 🧐</h3>
               <p className="text-gray-600 mb-6">

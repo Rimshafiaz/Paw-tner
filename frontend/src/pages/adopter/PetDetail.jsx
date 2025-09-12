@@ -39,7 +39,6 @@ function PetDetail() {
     checkIfFavorite()
   }, [petId, currentUser])
 
-  // Refetch favorites when page becomes visible
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden) {
@@ -55,13 +54,11 @@ function PetDetail() {
     try {
       setLoading(true)
       
-      // Fetch pet details
       const petResponse = await fetch(`http://localhost:8000/pets/${petId}`)
       if (petResponse.ok) {
         const petData = await petResponse.json()
         setPet(petData)
         
-        // Fetch shelter contact info
         const contactResponse = await fetch(`http://localhost:8000/pets/${petId}/contact`)
         if (contactResponse.ok) {
           const contactData = await contactResponse.json()
@@ -225,11 +222,18 @@ function PetDetail() {
           onClose={() => setNotification({ message: '', type: '', show: false })}
         />
 
-        {/* Back Button */}
+        <div className="text-center mb-8">
+          <div className="mb-4">
+            <span className="text-4xl animate-bounce">🐾</span>
+            <span className="text-4xl animate-pulse mx-4">💕</span>
+            <span className="text-4xl animate-bounce">✨</span>
+          </div>
+        </div>
+
         <div className="mb-6">
           <button
             onClick={() => navigate('/adopter/home')}
-            className="flex items-center bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full text-primary hover:text-primary/80 font-medium hover:bg-white/90 transition-all duration-200 transform hover:scale-105 shadow-lg"
+            className="bg-gradient-to-r from-purple-400 to-pink-500 text-white px-6 py-3 rounded-2xl font-bold hover:scale-105 transition-all duration-200 flex items-center shadow-lg border-2 border-purple-300"
           >
             🏠 ← Back to Browse Pets
           </button>
@@ -274,10 +278,15 @@ function PetDetail() {
 
           <div className="space-y-6">
 
-            <div className="bg-gradient-to-br from-orange-50/90 to-yellow-50/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 border border-orange-200 hover:shadow-xl transition-all duration-300">
+            <div className="bg-gradient-to-br from-orange-50/90 to-yellow-50/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 border-2 border-orange-200 hover:shadow-xl transition-all duration-300 hover:scale-105">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h1 className="text-4xl font-extrabold from-[#FF8C42] to-[#FE8B02] text-transparent bg-clip-text bg-gradient-to-br mb-2 "> {pet.name}🧡</h1>
+                  <h1 className="text-4xl font-extrabold mb-2">
+                    <span className="text-orange-500">Meet {pet.name}</span> 
+                    <span className="text-4xl ml-2">
+                      {pet.pet_type === 'dog' ? '🐕' : pet.pet_type === 'cat' ? '🐱' : pet.pet_type === 'bird' ? '🐦' : pet.pet_type === 'rabbit' ? '🐰' : '🐾'}
+                    </span>
+                  </h1>
                   <p className="text-lg text-gray-600 capitalize">
                     {pet.pet_type?.toLowerCase()} • {formatAge(pet.age_years, pet.age_months)}
                   </p>
@@ -299,7 +308,7 @@ function PetDetail() {
               )}
             </div>
 
-            <div className="bg-gradient-to-br from-blue-50/90 to-cyan-50/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 border border-blue-200 hover:shadow-xl transition-all duration-300">
+            <div className="bg-gradient-to-br from-blue-50/90 to-cyan-50/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 border-2 border-blue-200 hover:shadow-xl transition-all duration-300 hover:scale-105">
               <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 text-transparent bg-clip-text mb-6">📜 Basic Information</h2>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -329,7 +338,7 @@ function PetDetail() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-green-50/90 to-teal-50/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 border border-green-200 hover:shadow-xl transition-all duration-300">
+            <div className="bg-gradient-to-br from-green-50/90 to-teal-50/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 border-2 border-green-200 hover:shadow-xl transition-all duration-300 hover:scale-105">
               <h2 className="text-2xl font-bold bg-gradient-to-r from-green-600 to-teal-600 text-transparent bg-clip-text mb-6">😊 Personality & Care</h2>
               <div className="space-y-4">
                 {pet.temperament && (
@@ -368,7 +377,7 @@ function PetDetail() {
             </div>
 
             {(pet.medical_history || pet.vaccination_status || pet.special_needs) && (
-              <div className="bg-gradient-to-br from-red-50/90 to-pink-50/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 border border-red-200 hover:shadow-xl transition-all duration-300">
+              <div className="bg-gradient-to-br from-red-50/90 to-pink-50/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 border-2 border-red-200 hover:shadow-xl transition-all duration-300 hover:scale-105">
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-pink-600 text-transparent bg-clip-text mb-6">🌡️ Health Information</h2>
                 <div className="space-y-3">
                   {pet.vaccination_status && (
@@ -394,7 +403,7 @@ function PetDetail() {
             )}
 
             {shelter && (
-              <div className="bg-gradient-to-br from-purple-50/90 to-indigo-50/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 border border-purple-200 hover:shadow-xl transition-all duration-300">
+              <div className="bg-gradient-to-br from-purple-50/90 to-indigo-50/90 backdrop-blur-sm rounded-3xl shadow-lg p-8 border-2 border-purple-200 hover:shadow-xl transition-all duration-300 hover:scale-105">
                 <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent bg-clip-text mb-6">🏠 Contact Shelter</h2>
                 <div className="space-y-3">
                   <div>
@@ -402,7 +411,6 @@ function PetDetail() {
                     <p className="text-gray-800 font-medium">{shelter.name}</p>
                   </div>
                   
-                  {/* Location Information */}
                   {(shelter.address || shelter.city || shelter.state) && (
                     <div>
                       <span className="text-sm font-medium text-gray-500">Location</span>

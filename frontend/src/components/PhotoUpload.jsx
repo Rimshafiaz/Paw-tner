@@ -141,7 +141,6 @@ function PhotoUpload({ petId, currentPhotoUrl, onPhotoUploaded, onError }) {
     try {
       const token = localStorage.getItem('auth_token')
       
-      // Use the pet update endpoint to set photo to null
       const response = await fetch(`http://localhost:8000/pets/${petId}`, {
         method: 'PUT',
         headers: {

@@ -78,7 +78,6 @@ def migrate_database():
         import subprocess
         import os
         
-        # Run alembic upgrade
         result = subprocess.run(
             ["alembic", "upgrade", "head"], 
             cwd=os.path.dirname(__file__).replace("app", ""),
@@ -369,13 +368,11 @@ def delete_pet_photo(pet_id: int, db: Session = Depends(get_db), current_user=De
         if pet.shelter_id != current_user.id:
             raise HTTPException(403, "You can only delete photos for your own pets")
         
-        # Delete the physical file if it's a local upload (not external URL like Unsplash)
         if pet.primary_photo_url and pet.primary_photo_url.startswith('/uploads/'):
-            file_path = f"./uploads{pet.primary_photo_url[8:]}"  # Remove '/uploads' from URL
+            file_path = f"./uploads{pet.primary_photo_url[8:]}" 
             if os.path.exists(file_path):
                 os.remove(file_path)
         
-        # Clear the photo URL from database (works for both local and external URLs)
         pet.primary_photo_url = None
         db.commit()
         
@@ -665,7 +662,6 @@ def get_shelter_basic_info(shelter_id: int, db: Session = Depends(get_db)):
         if not shelter:
             raise HTTPException(404, "Shelter not found")
         
-        # Return all needed info for profile form
         return {
             "id": shelter.id,
             "name": shelter.name,

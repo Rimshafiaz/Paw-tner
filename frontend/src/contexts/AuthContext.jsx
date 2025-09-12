@@ -19,6 +19,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('auth_token')
     setIsLoggedIn(false)
     setCurrentUser(null)
+    window.location.href = '/'
   }
 
   const verifyStoredToken = async () => {

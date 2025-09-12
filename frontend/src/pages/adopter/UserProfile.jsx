@@ -171,8 +171,9 @@ function UserProfile() {
         backgroundAttachment: 'fixed'
       }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg font-medium">Loading your preferences... ✨</p>
+          <div className="animate-bounce text-6xl mb-6">⚙️</div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg font-medium animate-pulse">Loading your preferences... ✨</p>
         </div>
       </div>
     )
@@ -194,7 +195,6 @@ function UserProfile() {
           onClose={() => setNotification({ message: '', type: '', show: false })}
         />
 
-        {/* Header Section */}
         <div className="text-center mb-12">
           <div className="mb-6">
             <span className="text-6xl animate-bounce">🎯</span>
@@ -209,7 +209,6 @@ function UserProfile() {
           </p>
         </div>
 
-        {/* Back Button */}
         <div className="mb-8">
           <button
             onClick={() => navigate('/adopter/dashboard')}
@@ -222,7 +221,6 @@ function UserProfile() {
         <div className="bg-gradient-to-br from-white to-pink-50 rounded-3xl shadow-xl p-8 border-2 border-pink-200">
           <form onSubmit={handleSubmit} className="space-y-8">
             
-            {/* Pet Preferences Section */}
             <div className="border-b border-pink-200 pb-8">
               <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                 <span className="mr-3">🐕</span>
@@ -341,7 +339,6 @@ function UserProfile() {
               </div>
             </div>
 
-            {/* Lifestyle & Housing Section */}
             <div className="border-b border-pink-200 pb-8">
               <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                 <span className="mr-3">🏠</span>
@@ -429,7 +426,6 @@ function UserProfile() {
               </div>
             </div>
 
-            {/* Location Section */}
             <div className="border-b border-pink-200 pb-8">
               <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                 <span className="mr-3">📍</span>
@@ -491,7 +487,6 @@ function UserProfile() {
               </div>
             </div>
 
-            {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-pink-200">
               <button
                 type="button"

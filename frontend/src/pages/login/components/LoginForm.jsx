@@ -113,13 +113,13 @@ function LoginForm() {
   }
 
   return (
-    <div className="max-w-md mx-auto">
+    <div className="w-full max-w-md mx-auto px-4 md:px-0">
       <NotificationBanner 
         notification={notification} 
         onClose={() => setNotification({ message: '', type: '', show: false })}
       />
       
-      <div className="bg-white rounded-2xl shadow-lg p-8">
+      <div className="bg-white rounded-2xl shadow-lg p-4 md:p-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#FF2C00] to-[#00FF94] mb-2 drop-shadow-lg">Welcome Back</h1>
           <p className="text-gray-600">Sign in to your Paw-tner account</p>

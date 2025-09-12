@@ -5,19 +5,19 @@ function RoleSelector({ selectedRole, onRoleChange }) {
         <button
           type="button"
           onClick={() => onRoleChange('adopter')}
-          className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
+          className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm md:text-base transition-colors ${
             selectedRole === 'adopter'
               ? 'bg-white text-primary shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
           }`}
         >
-          <span className="mr-2">❤️</span>
+          <span className="mr-0.5">❤️</span>
           I'm an Adopter
         </button>
         <button
           type="button"
           onClick={() => onRoleChange('shelter')}
-          className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
+          className={`flex-1 py-3 px-4 rounded-lg font-medium text-sm md:text-base transition-colors ${
             selectedRole === 'shelter'
               ? 'bg-white text-secondary shadow-sm'
               : 'text-gray-600 hover:text-gray-800'
