@@ -1,5 +1,6 @@
 import LoginForm from './components/LoginForm'
 import pawtnerLoveImage from '../../assets/paw-tner love.jpg'
+import shelterBg from '../../assets/paw-tner_shelter.jpg'
 
 function Login() {
   return (

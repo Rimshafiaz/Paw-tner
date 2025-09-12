@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import NotificationBanner from '../../components/NotificationBanner'
 import PhotoSelector from '../../components/PhotoSelector'
+import shelterBg from '../../assets/paw-tner_shelter.jpg'
 
 function AddPet() {
   const navigate = useNavigate()
@@ -273,7 +274,15 @@ function AddPet() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div 
+      className="min-h-screen py-8 relative"
+      style={{
+        backgroundImage: `linear-gradient(rgba(240, 253, 252, 0.85), rgba(236, 252, 250, 0.85)), url(${shelterBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <NotificationBanner 
           notification={notification} 

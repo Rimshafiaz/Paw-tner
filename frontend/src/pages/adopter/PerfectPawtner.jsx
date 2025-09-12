@@ -196,8 +196,7 @@ function PerfectPawtner() {
               </div>
               <button
                 onClick={() => navigate('/adopter/home')}
-                className="bg-gradient-to-r from-blue-400 to-purple-500 text-white px-6 py-3 rounded-2xl font-bold hover:scale-105 transition-all duration-200 shadow-lg border-2 border-blue-300"
-              >
+                className="bg-gradient-to-r from-blue-400 to-purple-500 text-white px-6 py-3 rounded-2xl font-bold hover:scale-105 transition-all duration-200 shadow-lg border-2 border-blue-300">
                 🐕 Browse More Pets →
               </button>
             </div>

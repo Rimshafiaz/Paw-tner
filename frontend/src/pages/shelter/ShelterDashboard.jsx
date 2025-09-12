@@ -2,6 +2,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { isShelterProfileComplete, getMissingRequiredFields } from '../../utils/shelterProfile'
+import shelterBg from '../../assets/paw-tner_shelter.jpg'
 
 function ShelterDashboard() {
   const { currentUser } = useAuth()
@@ -115,7 +116,15 @@ function ShelterDashboard() {
   const missingFields = getMissingRequiredFields(shelter)
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div 
+      className="min-h-screen py-8 relative"
+      style={{
+        backgroundImage: `linear-gradient(rgba(240, 253, 252, 0.85), rgba(236, 252, 250, 0.85)), url(${shelterBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold from-[#4ECDC4] to-[#2DD4BF] text-transparent bg-clip-text bg-gradient-to-br">
@@ -164,45 +173,50 @@ function ShelterDashboard() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-red-500 hover:shadow-md hover:scale-105 transition-all duration-200">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Total Pets</h3>
-            <div className="text-3xl font-bold text-red-500 mb-1">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+          <div className="bg-white/95 backdrop-blur-sm p-4 md:p-6 rounded-xl shadow-lg border-l-4 border-secondary hover:shadow-xl hover:scale-105 transition-all duration-200">
+            <h3 className="text-sm md:text-lg font-semibold text-gray-800 mb-2">Total Pets</h3>
+            <div className="text-2xl md:text-3xl font-bold text-secondary mb-1">
               {stats?.total_pets || 0}
             </div>
-            <p className="text-gray-500 text-sm">All pets in your shelter</p>
+            <p className="text-gray-600 text-xs md:text-sm">All pets in your shelter</p>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-green-500 hover:shadow-md hover:scale-105 transition-all duration-200">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Available</h3>
-            <div className="text-3xl font-bold text-green-600 mb-1">
+          <div className="bg-white/95 backdrop-blur-sm p-4 md:p-6 rounded-xl shadow-lg border-l-4 border-green-500 hover:shadow-xl hover:scale-105 transition-all duration-200">
+            <h3 className="text-sm md:text-lg font-semibold text-gray-800 mb-2">Available</h3>
+            <div className="text-2xl md:text-3xl font-bold text-green-600 mb-1">
               {stats?.available_pets || 0}
             </div>
-            <p className="text-gray-500 text-sm">Ready for adoption</p>
+            <p className="text-gray-600 text-xs md:text-sm">Ready for adoption</p>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-yellow-500 hover:shadow-md hover:scale-105 transition-all duration-200">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Pending</h3>
-            <div className="text-3xl font-bold text-yellow-600 mb-1">
+          <div className="bg-white/95 backdrop-blur-sm p-4 md:p-6 rounded-xl shadow-lg border-l-4 border-amber-500 hover:shadow-xl hover:scale-105 transition-all duration-200">
+            <h3 className="text-sm md:text-lg font-semibold text-gray-800 mb-2">Pending</h3>
+            <div className="text-2xl md:text-3xl font-bold text-amber-600 mb-1">
               {stats?.pending_pets || 0}
             </div>
-            <p className="text-gray-500 text-sm">In adoption process</p>
+            <p className="text-gray-600 text-xs md:text-sm">In adoption process</p>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-sm border-l-4 border-purple-500 hover:shadow-md hover:scale-105 transition-all duration-200">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">Adopted</h3>
-            <div className="text-3xl font-bold text-purple-600 mb-1">
+          <div className="bg-white/95 backdrop-blur-sm p-4 md:p-6 rounded-xl shadow-lg border-l-4 border-purple-500 hover:shadow-xl hover:scale-105 transition-all duration-200">
+            <h3 className="text-sm md:text-lg font-semibold text-gray-800 mb-2">Adopted</h3>
+            <div className="text-2xl md:text-3xl font-bold text-purple-600 mb-1">
               {stats?.adopted_pets || 0}
             </div>
-            <p className="text-gray-500 text-sm">Successfully adopted</p>
+            <p className="text-gray-600 text-xs md:text-sm">Successfully adopted</p>
           </div>
         </div>
         
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-lg transition-all duration-200 group">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-secondary transition-colors duration-200">Add New Pet</h3>
-            <p className="text-gray-600 text-sm mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
+          <div className="bg-white/95 backdrop-blur-sm p-4 md:p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group border border-secondary/10">
+            <div className="flex items-center mb-3">
+              <div className="bg-secondary/10 p-2 rounded-lg mr-3">
+                <span className="text-xl">➕</span>
+              </div>
+              <h3 className="text-sm md:text-lg font-semibold text-gray-800 group-hover:text-secondary transition-colors duration-200">Add New Pet</h3>
+            </div>
+            <p className="text-gray-600 text-xs md:text-sm mb-4">
               List a new pet for adoption
             </p>
             <button 
@@ -213,9 +227,9 @@ function ShelterDashboard() {
                   navigate('/shelter/profile')
                 }
               }}
-              className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
+              className={`w-full py-2 px-4 rounded-xl font-medium transition-all duration-200 ${
                 isProfileComplete 
-                  ? 'bg-secondary text-white hover:bg-secondary/90 hover:shadow-md' 
+                  ? 'bg-gradient-to-r from-secondary to-secondary/80 text-white hover:shadow-md' 
                   : 'bg-amber-100 text-amber-800 hover:bg-amber-200'
               }`}
             >
@@ -223,29 +237,39 @@ function ShelterDashboard() {
             </button>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-lg transition-all duration-200 group">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-secondary transition-colors duration-200">Manage Pets</h3>
-            <p className="text-gray-600 text-sm mb-4">
+          <div className="bg-white/95 backdrop-blur-sm p-4 md:p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group border border-secondary/10">
+            <div className="flex items-center mb-3">
+              <div className="bg-secondary/10 p-2 rounded-lg mr-3">
+                <span className="text-xl">📋</span>
+              </div>
+              <h3 className="text-sm md:text-lg font-semibold text-gray-800 group-hover:text-secondary transition-colors duration-200">Manage Pets</h3>
+            </div>
+            <p className="text-gray-600 text-xs md:text-sm mb-4">
               View and edit your pet listings
             </p>
             <button 
               onClick={() => navigate('/shelter/pets/manage')}
-              className="w-full bg-secondary text-white py-2 px-4 rounded-lg hover:bg-secondary/90 hover:shadow-md transition-all duration-200"
+              className="w-full bg-gradient-to-r from-secondary to-secondary/80 text-white py-2 px-4 rounded-xl hover:shadow-md transition-all duration-200"
             >
               Manage Pets
             </button>
           </div>
           
-          <div className="bg-white p-6 rounded-lg shadow-sm hover:shadow-lg transition-all duration-200 group">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2 group-hover:text-secondary transition-colors duration-200">Shelter Profile</h3>
-            <p className="text-gray-600 text-sm mb-4">
+          <div className="bg-white/95 backdrop-blur-sm p-4 md:p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group border border-secondary/10">
+            <div className="flex items-center mb-3">
+              <div className="bg-secondary/10 p-2 rounded-lg mr-3">
+                <span className="text-xl">🏢</span>
+              </div>
+              <h3 className="text-sm md:text-lg font-semibold text-gray-800 group-hover:text-secondary transition-colors duration-200">Shelter Profile</h3>
+            </div>
+            <p className="text-gray-600 text-xs md:text-sm mb-4">
               Update your contact information and details
             </p>
             <button 
               onClick={() => navigate('/shelter/profile')}
-              className={`w-full py-2 px-4 rounded-lg font-medium transition-all duration-200 ${
+              className={`w-full py-2 px-4 rounded-xl font-medium transition-all duration-200 ${
                 isProfileComplete
-                  ? 'bg-secondary text-white hover:bg-secondary/80 hover:shadow-md'
+                  ? 'bg-gradient-to-r from-secondary to-secondary/80 text-white hover:shadow-md'
                   : 'bg-amber-100 text-amber-800 hover:bg-amber-200 ring-2 ring-amber-300'
               }`}
             >

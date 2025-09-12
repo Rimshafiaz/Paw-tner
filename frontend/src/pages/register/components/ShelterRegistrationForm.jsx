@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { validateEmail } from '../../../utils/validation'
 import NotificationBanner from '../../../components/NotificationBanner'
+import shelterBg from '../../../assets/paw-tner_shelter.jpg'
 
 function ShelterRegistrationForm() {
   const [formData, setFormData] = useState({
@@ -110,14 +111,22 @@ function ShelterRegistrationForm() {
   }
 
   return (
-    <div className="max-w-lg mx-auto">
-      <NotificationBanner 
-        notification={notification} 
-        onClose={() => setNotification({ message: '', type: '', show: false })}
-      />
-      
-      
-      <div className="bg-white rounded-2xl shadow-lg p-8">
+    <div 
+      className="min-h-screen py-8 relative"
+      style={{
+        backgroundImage: `linear-gradient(rgba(240, 253, 252, 0.85), rgba(236, 252, 250, 0.85)), url(${shelterBg})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      <div className="max-w-lg mx-auto px-4">
+        <NotificationBanner 
+          notification={notification} 
+          onClose={() => setNotification({ message: '', type: '', show: false })}
+        />
+        
+        <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-4 md:p-8 border border-secondary/20">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-secondary mb-2">Register Your Shelter</h1>
           <p className="text-gray-600">Turn your rescue missions into family reunions.</p>
@@ -274,6 +283,7 @@ function ShelterRegistrationForm() {
               Sign in
             </a>
           </p>
+        </div>
         </div>
       </div>
     </div>

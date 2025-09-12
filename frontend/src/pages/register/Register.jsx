@@ -4,6 +4,7 @@ import AccountTypeSelector from './components/AccountTypeSelector'
 import AdopterRegistrationForm from './components/AdopterRegistrationForm'
 import ShelterRegistrationForm from './components/ShelterRegistrationForm'
 import pawtnerLoveImage from '../../assets/paw-tner love.jpg'
+import shelterBg from '../../assets/paw-tner_shelter.jpg'
 
 function Register() {
   const [selectedAccountType, setSelectedAccountType] = useState(null)
@@ -29,7 +30,9 @@ function Register() {
     <div 
       className="min-h-screen py-8 px-4 relative"
       style={{
-        backgroundImage: `linear-gradient(rgba(255, 248, 240, 0.85), rgba(240, 255, 248, 0.85)), url(${pawtnerLoveImage})`,
+        backgroundImage: selectedAccountType === 'shelter' 
+          ? `linear-gradient(rgba(240, 253, 252, 0.85), rgba(236, 252, 250, 0.85)), url(${shelterBg})`
+          : `linear-gradient(rgba(255, 248, 240, 0.85), rgba(240, 255, 248, 0.85)), url(${pawtnerLoveImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
