@@ -104,11 +104,21 @@ class PetCRUD:
     @staticmethod
     def create_pet(db: Session, pet: schemas.PetCreate) -> models.Pet:
         """Create a new pet"""
-        db_pet = models.Pet(**pet.dict())
-        db.add(db_pet)
-        db.commit()
-        db.refresh(db_pet)
-        return db_pet
+        try:
+            pet_dict = pet.dict()
+            print(f"Creating pet with dict: {pet_dict}")
+            db_pet = models.Pet(**pet_dict)
+            db.add(db_pet)
+            db.commit()
+            db.refresh(db_pet)
+            return db_pet
+        except Exception as e:
+            print(f"ERROR in PetCRUD.create_pet: {type(e).__name__}: {str(e)}")
+            print(f"Pet dict keys: {list(pet_dict.keys()) if 'pet_dict' in locals() else 'N/A'}")
+            import traceback
+            traceback.print_exc()
+            db.rollback()
+            raise
     
     @staticmethod
     def update_pet(db: Session, pet_id: int, pet_update: schemas.PetUpdate) -> Optional[models.Pet]:

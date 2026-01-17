@@ -269,12 +269,15 @@ class PetService:
     
     @staticmethod
     def create_pet(db: Session, pet_data: schemas.PetCreate) -> models.Pet:
-        
- 
-        PetService._validate_pet_data(pet_data.age_years, pet_data.adoption_fee, pet_data.temperament)
-        
-
-        return crud.PetCRUD.create_pet(db, pet_data)
+        try:
+            PetService._validate_pet_data(pet_data.age_years, pet_data.adoption_fee, pet_data.temperament)
+            return crud.PetCRUD.create_pet(db, pet_data)
+        except Exception as e:
+            print(f"ERROR in PetService.create_pet: {type(e).__name__}: {str(e)}")
+            print(f"Pet data: {pet_data.dict() if hasattr(pet_data, 'dict') else 'N/A'}")
+            import traceback
+            traceback.print_exc()
+            raise
     
     @staticmethod
     def update_pet(db: Session, pet_id: int, update_data: schemas.PetUpdate) -> models.Pet:

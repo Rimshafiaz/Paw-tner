@@ -419,16 +419,33 @@ def create_pet(
         pet_dict = pet.dict()
         pet_dict["shelter_id"] = current_user.id
         
+        print(f"DEBUG: pet_dict before enum conversion: {pet_dict}")
+        print(f"DEBUG: pet_type type: {type(pet_dict.get('pet_type'))}, value: {pet_dict.get('pet_type')}")
+        print(f"DEBUG: size type: {type(pet_dict.get('size'))}, value: {pet_dict.get('size')}")
+        
         from .models import PetType, PetSize, ActivityLevel, AdoptionStatus
         
         if isinstance(pet_dict.get("pet_type"), str):
             pet_dict["pet_type"] = PetType(pet_dict["pet_type"].lower())
+        elif hasattr(pet_dict.get("pet_type"), "value"):
+            pet_dict["pet_type"] = PetType(pet_dict["pet_type"].value.lower())
+            
         if isinstance(pet_dict.get("size"), str):
             pet_dict["size"] = PetSize(pet_dict["size"].lower())
+        elif hasattr(pet_dict.get("size"), "value"):
+            pet_dict["size"] = PetSize(pet_dict["size"].value.lower())
+            
         if isinstance(pet_dict.get("activity_level"), str):
             pet_dict["activity_level"] = ActivityLevel(pet_dict["activity_level"].lower())
+        elif pet_dict.get("activity_level") and hasattr(pet_dict.get("activity_level"), "value"):
+            pet_dict["activity_level"] = ActivityLevel(pet_dict["activity_level"].value.lower())
+            
         if isinstance(pet_dict.get("adoption_status"), str):
             pet_dict["adoption_status"] = AdoptionStatus(pet_dict["adoption_status"].lower())
+        elif pet_dict.get("adoption_status") and hasattr(pet_dict.get("adoption_status"), "value"):
+            pet_dict["adoption_status"] = AdoptionStatus(pet_dict["adoption_status"].value.lower())
+        
+        print(f"DEBUG: pet_dict after enum conversion: {pet_dict}")
         
         pet_with_shelter = schemas.PetCreate(**pet_dict)
         result = services.PetService.create_pet(db=db, pet_data=pet_with_shelter)
