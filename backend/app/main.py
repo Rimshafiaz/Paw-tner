@@ -30,25 +30,42 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS configuration
-allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "*")
+# IMPORTANT: When allow_credentials=True, you CANNOT use allow_origins=["*"]
+# You must specify exact origins
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "")
 # Split by comma and strip whitespace
 allowed_origins = [origin.strip() for origin in allowed_origins_env.split(",") if origin.strip()]
 
-# If "*" is in the list, use wildcard (but this doesn't work with credentials)
-# So we'll use the specific origins if provided, otherwise allow all
-if "*" in allowed_origins and len(allowed_origins) == 1:
-    # Allow all origins (for testing only)
+# If no origins specified, default to common Vercel patterns
+# But ideally, user should set ALLOWED_ORIGINS in Render
+if not allowed_origins:
+    print("WARNING: ALLOWED_ORIGINS not set! CORS may not work properly.")
+    print("Please set ALLOWED_ORIGINS in Render environment variables.")
+    # Default to allowing common patterns (this is a fallback)
+    allow_origins_list = [
+        "https://paw-tner-qr3m.vercel.app",
+        "https://paw-tner.vercel.app",
+        "http://localhost:5173",
+        "http://localhost:3000",
+    ]
+elif "*" in allowed_origins:
+    # If user explicitly set "*", we can't use credentials
+    # So we'll disable credentials in this case
+    print("WARNING: Using '*' with credentials is not allowed. Disabling credentials.")
     allow_origins_list = ["*"]
+    use_credentials = False
 else:
-    # Use specific origins
+    # Use specific origins (recommended)
     allow_origins_list = allowed_origins
+    use_credentials = True
 
 print(f"CORS configured with origins: {allow_origins_list}")
+print(f"CORS credentials enabled: {use_credentials}")
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allow_origins_list,
-    allow_credentials=True,
+    allow_credentials=use_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"],
