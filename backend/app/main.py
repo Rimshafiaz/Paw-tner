@@ -133,6 +133,19 @@ def create_database_tables():
         return {"message": "Database tables created successfully!"}
     except Exception as e:
         return {"message": "Failed to create tables", "error": str(e)}
+
+@app.post("/fix-pet-sequence", tags=["Database"])
+def fix_pet_sequence(db: Session = Depends(get_db)):
+    """Fix PostgreSQL sequence for pets.id if it's out of sync"""
+    try:
+        result = db.execute(text("""
+            SELECT setval('pets_id_seq', COALESCE((SELECT MAX(id) FROM pets), 1), true);
+        """))
+        db.commit()
+        return {"message": "Pet sequence fixed successfully!"}
+    except Exception as e:
+        db.rollback()
+        return {"message": "Failed to fix sequence", "error": str(e)}
     
 
 
@@ -426,11 +439,26 @@ def create_pet(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"ERROR in create_pet endpoint: {type(e).__name__}: {str(e)}")
+        error_str = str(e)
+        print(f"ERROR in create_pet endpoint: {type(e).__name__}: {error_str}")
         import traceback
         print("Full traceback:")
         traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+        
+        # Check for specific database errors and return user-friendly messages
+        if "UniqueViolation" in error_str or "duplicate key" in error_str.lower():
+            if "pets_pkey" in error_str or "id" in error_str.lower():
+                return HTTPException(
+                    status_code=500, 
+                    detail="A database error occurred. Please try again in a moment."
+                )
+            else:
+                return HTTPException(
+                    status_code=400,
+                    detail="A pet with similar information already exists. Please check your input."
+                )
+        
+        raise HTTPException(status_code=500, detail="An error occurred while creating the pet. Please try again.")
 
 @app.put("/pets/{pet_id}", response_model=schemas.Pet)
 def update_pet(pet_id: int, pet_update: schemas.PetUpdate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):

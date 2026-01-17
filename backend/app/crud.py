@@ -106,6 +106,7 @@ class PetCRUD:
         """Create a new pet"""
         try:
             pet_dict = pet.dict()
+            pet_dict.pop('id', None)
             db_pet = models.Pet(**pet_dict)
             db.add(db_pet)
             db.commit()
