@@ -134,7 +134,7 @@ def create_database_tables():
     except Exception as e:
         return {"message": "Failed to create tables", "error": str(e)}
 
-@app.post("/fix-pet-sequence", tags=["Database"])
+@app.get("/fix-pet-sequence", tags=["Database"])
 def fix_pet_sequence(db: Session = Depends(get_db)):
     """Fix PostgreSQL sequence for pets.id if it's out of sync"""
     try:
