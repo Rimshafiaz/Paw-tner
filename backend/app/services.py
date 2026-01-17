@@ -444,11 +444,14 @@ class ShelterService:
     
     @staticmethod
     def register_shelter(db: Session, shelter_data: schemas.ShelterRegister) -> models.Shelter:
-        existing_user = crud.UserCRUD.get_user_by_email(db, shelter_data.email)
-        existing_shelter = crud.ShelterCRUD.get_shelter_by_email(db, shelter_data.email)
+        email_lower = shelter_data.email.lower().strip()
+        existing_user = crud.UserCRUD.get_user_by_email(db, email_lower)
+        existing_shelter = crud.ShelterCRUD.get_shelter_by_email(db, email_lower)
         
-        if existing_user or existing_shelter:
-            raise ValueError("Email already registered. Please use a different email address.")
+        if existing_user:
+            raise ValueError("This email is already registered as an adopter account. Please use a different email or log in to your adopter account.")
+        if existing_shelter:
+            raise ValueError("This email is already registered as a shelter account. Please use a different email or try logging in instead.")
         
         hashed_password = auth.hash_password(shelter_data.password)
         

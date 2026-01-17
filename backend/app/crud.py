@@ -176,8 +176,9 @@ class ShelterCRUD:
     
     @staticmethod
     def get_shelter_by_email(db: Session, email: str) -> Optional[models.Shelter]:
-        """Get shelter by email (for authentication)"""
-        return db.query(models.Shelter).filter(models.Shelter.email == email).first()
+        """Get shelter by email (for authentication) - case insensitive"""
+        from sqlalchemy import func
+        return db.query(models.Shelter).filter(func.lower(models.Shelter.email) == email.lower().strip()).first()
 
 
 # User CRUD operations 
@@ -189,8 +190,9 @@ class UserCRUD:
     
     @staticmethod
     def get_user_by_email(db: Session, email: str) -> Optional[models.User]:
-        """Get user by email"""
-        return db.query(models.User).filter(models.User.email == email).first()
+        """Get user by email - case insensitive"""
+        from sqlalchemy import func
+        return db.query(models.User).filter(func.lower(models.User.email) == email.lower().strip()).first()
     
     @staticmethod
     def create_user(db: Session, user: schemas.UserCreate) -> models.User:
