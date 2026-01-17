@@ -84,8 +84,11 @@ def migrate_database():
     try:
         from alembic import command
         from alembic.config import Config
+        from alembic.runtime.migration import MigrationContext
+        from alembic.script import ScriptDirectory
         import os
         from pathlib import Path
+        from sqlalchemy import create_engine
         
         current_file = Path(__file__).resolve()
         backend_dir = current_file.parent.parent.resolve()
@@ -102,13 +105,15 @@ def migrate_database():
         try:
             os.chdir(str(backend_dir))
             
-            alembic_cfg = Config(str(alembic_cfg_path))
-            
             database_url = os.getenv("DATABASE_URL")
             if not database_url:
                 return {"message": "Migration failed", "error": "DATABASE_URL not set"}
             
-            alembic_cfg.set_main_option("sqlalchemy.url", database_url)
+            alembic_cfg = Config(str(alembic_cfg_path))
+            alembic_cfg.attributes['connection'] = create_engine(database_url).connect()
+            
+            script_location = backend_dir / "alembic"
+            alembic_cfg.set_main_option("script_location", str(script_location))
             
             command.upgrade(alembic_cfg, "head")
             
