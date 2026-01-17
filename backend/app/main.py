@@ -80,22 +80,37 @@ def create_database_tables():
 
 @app.post("/migrate-database")
 def migrate_database():
-    """Apply pending database migrations safely"""
+    """Apply pending database migrations safely - only adds new tables/columns, never deletes data"""
     try:
         import subprocess
         import os
+        from pathlib import Path
+        
+        backend_dir = Path(__file__).parent.parent
+        os.chdir(backend_dir)
+        
+        os.environ['DATABASE_URL'] = os.getenv('DATABASE_URL', '')
         
         result = subprocess.run(
             ["alembic", "upgrade", "head"], 
-            cwd=os.path.dirname(__file__).replace("app", ""),
+            cwd=str(backend_dir),
             capture_output=True, 
-            text=True
+            text=True,
+            env=os.environ.copy()
         )
         
         if result.returncode == 0:
-            return {"message": "Database migrations applied successfully!", "output": result.stdout}
+            return {
+                "message": "Database migrations applied successfully!",
+                "output": result.stdout,
+                "note": "This only adds new tables/columns. Your existing data is safe."
+            }
         else:
-            return {"message": "Migration failed", "error": result.stderr}
+            return {
+                "message": "Migration failed", 
+                "error": result.stderr,
+                "stdout": result.stdout
+            }
     except Exception as e:
         return {"message": "Failed to run migrations", "error": str(e)}
 

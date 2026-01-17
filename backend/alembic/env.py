@@ -8,16 +8,23 @@ from alembic import context
 
 config = context.config
 
-
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 import sys
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from app.models import Base
 target_metadata = Base.metadata
+
+database_url = os.getenv("DATABASE_URL")
+if database_url:
+    config.set_main_option("sqlalchemy.url", database_url)
 
 
 
