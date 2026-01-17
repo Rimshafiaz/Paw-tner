@@ -162,8 +162,12 @@ class ShelterRegister(ShelterBase):
     def validate_password(cls, v):
         if len(v) < 8:
             raise ValueError('Password must be at least 8 characters long')
-        if len(v.encode('utf-8')) > 72:
-            raise ValueError('Password cannot be longer than 72 bytes')
+        password_bytes = v.encode('utf-8')
+        if len(password_bytes) > 72:
+            truncated_bytes = password_bytes[:72]
+            while truncated_bytes and (truncated_bytes[-1] & 0b11000000) == 0b10000000:
+                truncated_bytes = truncated_bytes[:-1]
+            v = truncated_bytes.decode('utf-8', errors='ignore')
         return v
 
 class Shelter(ShelterBase):
