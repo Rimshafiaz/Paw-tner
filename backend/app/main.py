@@ -78,7 +78,7 @@ def create_database_tables():
     
 
 
-@app.post("/migrate-database")
+@app.get("/migrate-database")
 def migrate_database():
     """Apply pending database migrations safely - only adds new tables/columns, never deletes data"""
     try:
