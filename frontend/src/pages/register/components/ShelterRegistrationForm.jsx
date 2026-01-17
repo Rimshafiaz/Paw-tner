@@ -22,6 +22,8 @@ function ShelterRegistrationForm() {
   const [notification, setNotification] = useState({ message: '', type: '', show: false })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [emailValidation, setEmailValidation] = useState({ isValid: true, message: '' })
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
 
   const handleChange = (e) => {
