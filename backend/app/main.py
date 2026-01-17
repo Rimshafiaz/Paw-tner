@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from .database import get_db, engine, create_tables, recreate_tables
 from .models import User, Pet, Shelter, UserFavorite
 from . import schemas, crud, services, models
@@ -17,12 +18,21 @@ from slowapi.errors import RateLimitExceeded
 import os
 import uuid
 from pathlib import Path
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 
 app = FastAPI(
     title="Paw-tner API",
     description="Pet matching platform API",
     version="1.0.0"
+)
+
+cloudinary.config(
+    cloud_name=os.getenv("CLOUDINARY_CLOUD_NAME", ""),
+    api_key=os.getenv("CLOUDINARY_API_KEY", ""),
+    api_secret=os.getenv("CLOUDINARY_API_SECRET", "")
 )
 
 allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "")
@@ -478,14 +488,36 @@ def upload_pet_photo(pet_id: int, file: UploadFile = File(...), db: Session = De
         if file_extension not in ['jpg', 'jpeg', 'png', 'gif']:
             raise HTTPException(400, "Invalid file type. Use: jpg, jpeg, png, gif")
         
-        unique_filename = f"{uuid.uuid4()}.{file_extension}"
-        file_path = Path("uploads/pets") / unique_filename
+        file_content = file.file.read()
+        file.file.seek(0)
         
-        with open(file_path, "wb") as buffer:
-            content = file.file.read()
-            buffer.write(content)
+        cloud_name = os.getenv("CLOUDINARY_CLOUD_NAME")
+        if cloud_name:
+            try:
+                unique_filename = f"pets/{uuid.uuid4()}.{file_extension}"
+                upload_result = cloudinary.uploader.upload(
+                    file_content,
+                    folder="paw-tner/pets",
+                    public_id=unique_filename,
+                    resource_type="image"
+                )
+                photo_url = upload_result.get("secure_url") or upload_result.get("url")
+            except Exception as cloudinary_error:
+                print(f"Cloudinary upload failed: {cloudinary_error}, falling back to local storage")
+                unique_filename = f"{uuid.uuid4()}.{file_extension}"
+                file_path = Path("uploads/pets") / unique_filename
+                file_path.parent.mkdir(parents=True, exist_ok=True)
+                with open(file_path, "wb") as buffer:
+                    buffer.write(file_content)
+                photo_url = f"/uploads/pets/{unique_filename}"
+        else:
+            unique_filename = f"{uuid.uuid4()}.{file_extension}"
+            file_path = Path("uploads/pets") / unique_filename
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(file_path, "wb") as buffer:
+                buffer.write(file_content)
+            photo_url = f"/uploads/pets/{unique_filename}"
         
-        photo_url = f"/uploads/pets/{unique_filename}"
         pet.primary_photo_url = photo_url
         db.commit()
         
@@ -547,6 +579,11 @@ def create_user(request: Request, user: schemas.UserCreate, db: Session = Depend
         return services.UserService.create_user(db=db, user_data=user)
     except ValueError as e:  
         raise HTTPException(status_code=400, detail=str(e))
+    except IntegrityError as e:
+        error_str = str(e.orig) if hasattr(e, 'orig') else str(e)
+        if 'unique' in error_str.lower() or 'duplicate' in error_str.lower():
+            raise HTTPException(status_code=400, detail="An account with this email already exists. Please use a different email or try logging in.")
+        raise HTTPException(status_code=400, detail="A database constraint was violated. Please check your input.")
     except Exception as e:   
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -823,6 +860,11 @@ def register_shelter(request: Request, shelter: schemas.ShelterRegister, db: Ses
         return services.ShelterService.register_shelter(db=db, shelter_data=shelter)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    except IntegrityError as e:
+        error_str = str(e.orig) if hasattr(e, 'orig') else str(e)
+        if 'unique' in error_str.lower() or 'duplicate' in error_str.lower():
+            raise HTTPException(status_code=400, detail="An account with this email already exists. Please use a different email or try logging in.")
+        raise HTTPException(status_code=400, detail="A database constraint was violated. Please check your input.")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
