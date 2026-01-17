@@ -82,6 +82,10 @@ function AdopterRegistrationForm() {
         role: 'adopter'
       }
 
+      console.log('API_URL:', API_URL)
+      console.log('Registration endpoint:', `${API_URL}/users`)
+      console.log('Registration data:', registrationData)
+      
       const response = await fetch(`${API_URL}/users`, {
         method: 'POST',
         headers: {
@@ -92,6 +96,9 @@ function AdopterRegistrationForm() {
       })
       
       clearTimeout(timeoutId)
+      
+      console.log('Response status:', response.status)
+      console.log('Response ok:', response.ok)
 
       if (response.ok) {
         const result = await response.json()
@@ -104,10 +111,13 @@ function AdopterRegistrationForm() {
         showNotification(error.detail || 'Registration failed. Please check your information and try again.', 'error')
       }
     } catch (error) {
+      console.error('Registration error:', error)
+      console.error('Error name:', error.name)
+      console.error('Error message:', error.message)
       if (error.name === 'AbortError') {
         showNotification('Request timeout. Please check your connection and try again.', 'error')
       } else {
-        showNotification('Connection failed. Please check your internet and try again.', 'error')
+        showNotification(`Connection failed: ${error.message}. Check console for details.`, 'error')
       }
     } finally {
       setIsSubmitting(false)

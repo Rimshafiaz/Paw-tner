@@ -29,13 +29,29 @@ limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-allowed_origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+# CORS configuration
+allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "*")
+# Split by comma and strip whitespace
+allowed_origins = [origin.strip() for origin in allowed_origins_env.split(",") if origin.strip()]
+
+# If "*" is in the list, use wildcard (but this doesn't work with credentials)
+# So we'll use the specific origins if provided, otherwise allow all
+if "*" in allowed_origins and len(allowed_origins) == 1:
+    # Allow all origins (for testing only)
+    allow_origins_list = ["*"]
+else:
+    # Use specific origins
+    allow_origins_list = allowed_origins
+
+print(f"CORS configured with origins: {allow_origins_list}")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins if "*" not in allowed_origins else ["*"],
+    allow_origins=allow_origins_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 @app.exception_handler(ValidationError)
