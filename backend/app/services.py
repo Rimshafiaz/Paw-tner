@@ -23,6 +23,7 @@ class UserService:
         
         
         user_dict = user_data.dict()
+        user_dict["email"] = email_lower
         user_dict["hashed_password"] = hashed_password
         del user_dict["password"]  
         
@@ -458,6 +459,7 @@ class ShelterService:
         hashed_password = auth.hash_password(shelter_data.password)
         
         shelter_dict = shelter_data.dict()
+        shelter_dict["email"] = email_lower
         shelter_dict["hashed_password"] = hashed_password
         shelter_dict["is_verified"] = True
         del shelter_dict["password"]
