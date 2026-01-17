@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { validateEmail } from '../../../utils/validation'
 import NotificationBanner from '../../../components/NotificationBanner'
+import API_URL from '../../../config/api'
 
 function AdopterRegistrationForm() {
   const [formData, setFormData] = useState({
@@ -81,7 +82,7 @@ function AdopterRegistrationForm() {
         role: 'adopter'
       }
 
-      const response = await fetch('http://localhost:8000/users', {
+      const response = await fetch(`${API_URL}/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

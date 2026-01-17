@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import NotificationBanner from '../../components/NotificationBanner'
 import shelterBg from '../../assets/paw-tner_shelter.jpg'
+import API_URL from '../../config/api'
 
 function ShelterProfile() {
   const navigate = useNavigate()
@@ -47,7 +48,7 @@ function ShelterProfile() {
       
       if (!shelterId) return
       
-      const response = await fetch(`http://localhost:8000/shelters/${shelterId}/basic`)
+      const response = await fetch(`${API_URL}/shelters/${shelterId}/basic`)
 
       if (response.ok) {
         const shelter = await response.json()
@@ -132,7 +133,7 @@ function ShelterProfile() {
         capacity: formData.capacity ? parseInt(formData.capacity) : null
       }
 
-      const response = await fetch(`http://localhost:8000/shelters/${shelterId}/profile`, {
+      const response = await fetch(`${API_URL}/shelters/${shelterId}/profile`, {
         method: 'PUT',
 
         headers: {

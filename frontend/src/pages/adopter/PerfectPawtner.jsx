@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import NotificationBanner from '../../components/NotificationBanner'
 import adopterPawtnerImage from '../../assets/adopter paw-tner.jpg'
+import API_URL from '../../config/api'
 
 function PerfectPawtner() {
   const { currentUser } = useAuth()
@@ -37,7 +38,7 @@ function PerfectPawtner() {
         return
       }
 
-      const response = await fetch(`http://localhost:8000/users/${userId}/matches`, {
+      const response = await fetch(`${API_URL}/users/${userId}/matches`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -70,7 +71,7 @@ function PerfectPawtner() {
 
   const getImageUrl = (photoUrl) => {
     if (!photoUrl) return null
-    return photoUrl.startsWith('http') ? photoUrl : `http://localhost:8000${photoUrl}`
+    return photoUrl.startsWith('http') ? photoUrl : `${API_URL}${photoUrl}`
   }
 
   const formatAge = (years, months) => {

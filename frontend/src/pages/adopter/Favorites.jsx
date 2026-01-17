@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import NotificationBanner from '../../components/NotificationBanner'
 import adopterPawtnerImage from '../../assets/adopter paw-tner.jpg'
+import API_URL from '../../config/api'
 
 function Favorites() {
   const { currentUser } = useAuth()
@@ -48,7 +49,7 @@ function Favorites() {
         return
       }
 
-      const response = await fetch(`http://localhost:8000/users/${userId}/favorites`, {
+      const response = await fetch(`${API_URL}/users/${userId}/favorites`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -78,7 +79,7 @@ function Favorites() {
       setRemovingFavorite(prev => ({ ...prev, [petId]: true }))
       const userId = currentUser?.allUserData?.id
       
-      const response = await fetch(`http://localhost:8000/users/${userId}/favorites/${petId}`, {
+      const response = await fetch(`${API_URL}/users/${userId}/favorites/${petId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
@@ -100,7 +101,7 @@ function Favorites() {
 
   const getImageUrl = (photoUrl) => {
     if (!photoUrl) return null
-    return photoUrl.startsWith('http') ? photoUrl : `http://localhost:8000${photoUrl}`
+    return photoUrl.startsWith('http') ? photoUrl : `${API_URL}${photoUrl}`
   }
 
   const formatAge = (years, months) => {

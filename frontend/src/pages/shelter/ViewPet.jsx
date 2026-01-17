@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import NotificationBanner from '../../components/NotificationBanner'
 import shelterBg from '../../assets/paw-tner_shelter.jpg'
+import API_URL from '../../config/api'
 
 function ViewPet() {
   const navigate = useNavigate()
@@ -27,7 +28,7 @@ function ViewPet() {
   const fetchPetData = async () => {
     try {
       const token = localStorage.getItem('auth_token')
-      const response = await fetch(`http://localhost:8000/pets/${petId}`, {
+      const response = await fetch(`${API_URL}/pets/${petId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
 
@@ -120,7 +121,7 @@ function ViewPet() {
             </div>
             {pet.primary_photo_url ? (
               <img 
-                src={`http://localhost:8000${pet.primary_photo_url}`} 
+                src={`${API_URL}${pet.primary_photo_url}`} 
                 alt={pet.name}
                 className="w-40 h-40 rounded-xl object-cover shadow-lg"
               />

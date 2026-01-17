@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import NotificationBanner from '../../components/NotificationBanner'
 import PhotoSelector from '../../components/PhotoSelector'
 import shelterBg from '../../assets/paw-tner_shelter.jpg'
+import API_URL from '../../config/api'
 
 function AddPet() {
   const navigate = useNavigate()
@@ -77,7 +78,7 @@ function AddPet() {
       const formData = new FormData()
       formData.append('file', photoFile)
       
-      const response = await fetch(`http://localhost:8000/pets/${petId}/upload-photo`, {
+      const response = await fetch(`${API_URL}/pets/${petId}/upload-photo`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -134,7 +135,7 @@ function AddPet() {
       }
 
       
-      const url = `http://localhost:8000/pets${overrideDuplicate ? '?override_duplicate=true' : ''}`
+      const url = `${API_URL}/pets${overrideDuplicate ? '?override_duplicate=true' : ''}`
       
       const response = await fetch(url, {
         method: 'POST',

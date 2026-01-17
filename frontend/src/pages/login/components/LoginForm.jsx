@@ -4,6 +4,7 @@ import { validateEmail } from '../../../utils/validation'
 import NotificationBanner from '../../../components/NotificationBanner'
 import RoleSelector from './RoleSelector'
 import { useAuth } from '../../../contexts/AuthContext'
+import API_URL from '../../../config/api'
 
 function LoginForm() {
   const [formData, setFormData] = useState({
@@ -59,8 +60,8 @@ function LoginForm() {
       const timeoutId = setTimeout(() => controller.abort(), 15000)
       
       const endpoint = formData.userType === 'adopter' 
-        ? 'http://localhost:8000/login'
-        : 'http://localhost:8000/shelters/login'
+        ? `${API_URL}/login`
+        : `${API_URL}/shelters/login`
 
       const response = await fetch(endpoint, {
         method: 'POST',

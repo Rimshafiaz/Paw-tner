@@ -11,7 +11,9 @@ from .auth import get_current_user
 from sqlalchemy import text
 from typing import Optional, List
 from pydantic import ValidationError
-from fastapi.responses import JSONResponse
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 import os
 import uuid
 from pathlib import Path
@@ -23,9 +25,14 @@ app = FastAPI(
     version="1.0.0"
 )
 
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=allowed_origins if "*" not in allowed_origins else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -385,7 +392,8 @@ def delete_pet_photo(pet_id: int, db: Session = Depends(get_db), current_user=De
 
 # User Endpoints
 @app.post("/users", response_model=schemas.User)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+@limiter.limit("3/minute")
+def create_user(request: Request, user: schemas.UserCreate, db: Session = Depends(get_db)):
     """Create a new user account"""
     try:
         
@@ -396,7 +404,8 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/login", response_model=schemas.TokenResponse)
-def login(login_data: schemas.LoginRequest, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def login(request: Request, login_data: schemas.LoginRequest, db: Session = Depends(get_db)):
     try:
         user = services.UserService.authenticate_user(
             db=db, 
@@ -646,7 +655,8 @@ def get_shelter_stats(shelter_id: int, db: Session = Depends(get_db), current_us
 
 
 @app.post("/shelters/register", response_model=schemas.Shelter)
-def register_shelter(shelter: schemas.ShelterRegister, db: Session = Depends(get_db)):
+@limiter.limit("3/minute")
+def register_shelter(request: Request, shelter: schemas.ShelterRegister, db: Session = Depends(get_db)):
     try:
         return services.ShelterService.register_shelter(db=db, shelter_data=shelter)
     except ValueError as e:
@@ -794,7 +804,8 @@ def reactivate_shelter(shelter_id: int, current_user=Depends(get_current_user), 
     return {"message": "Shelter reactivated"}
 
 @app.post("/shelters/login", response_model=schemas.TokenResponse)
-def shelter_login(login_data: schemas.LoginRequest, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def shelter_login(request: Request, login_data: schemas.LoginRequest, db: Session = Depends(get_db)):
     """Shelter login endpoint"""
     try:
         shelter = services.ShelterService.authenticate_shelter(

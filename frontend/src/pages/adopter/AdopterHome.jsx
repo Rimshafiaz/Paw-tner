@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import NotificationBanner from '../../components/NotificationBanner'
 import adopterPawtnerImage from '../../assets/adopter paw-tner.jpg'
+import API_URL from '../../config/api'
 
 function AdopterHome() {
   const { currentUser } = useAuth()
@@ -64,7 +65,7 @@ function AdopterHome() {
       if (ageRange.min) params.append('age_min', ageRange.min)
       if (ageRange.max) params.append('age_max', ageRange.max)
 
-      const response = await fetch(`http://localhost:8000/pets?${params}`)
+      const response = await fetch(`${API_URL}/pets?${params}`)
       if (response.ok) {
         const data = await response.json()
         const newPets = Array.isArray(data) ? data : data.pets || []
@@ -97,7 +98,7 @@ function AdopterHome() {
       
       if (!userId || !token) return
 
-      const response = await fetch(`http://localhost:8000/users/${userId}/favorites`, {
+      const response = await fetch(`${API_URL}/users/${userId}/favorites`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -126,7 +127,7 @@ function AdopterHome() {
 
       const isFavorite = favorites.has(petId)
       const method = isFavorite ? 'DELETE' : 'POST'
-      const response = await fetch(`http://localhost:8000/users/${userId}/favorites/${petId}`, {
+      const response = await fetch(`${API_URL}/users/${userId}/favorites/${petId}`, {
         method,
         headers: {
           'Authorization': `Bearer ${token}`
@@ -160,7 +161,7 @@ function AdopterHome() {
 
   const getImageUrl = (photoUrl) => {
     if (!photoUrl) return null
-    return photoUrl.startsWith('http') ? photoUrl : `http://localhost:8000${photoUrl}`
+    return photoUrl.startsWith('http') ? photoUrl : `${API_URL}${photoUrl}`
   }
 
   const filteredPets = pets.filter(pet => {

@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { isShelterProfileComplete, getMissingRequiredFields } from '../../utils/shelterProfile'
 import shelterBg from '../../assets/paw-tner_shelter.jpg'
+import API_URL from '../../config/api'
 
 function ShelterDashboard() {
   const { currentUser } = useAuth()
@@ -32,13 +33,13 @@ function ShelterDashboard() {
 
       try {
         const [statsResponse, petsResponse, shelterResponse] = await Promise.all([
-          fetch(`http://localhost:8000/shelters/${shelterId}/stats`, {
+          fetch(`${API_URL}/shelters/${shelterId}/stats`, {
             headers: { 'Authorization': `Bearer ${token}` }
           }),
-          fetch(`http://localhost:8000/pets?shelter_id=${shelterId}&limit=6`, {
+          fetch(`${API_URL}/pets?shelter_id=${shelterId}&limit=6`, {
             headers: { 'Authorization': `Bearer ${token}` }
           }),
-          fetch(`http://localhost:8000/shelters/${shelterId}`, {
+          fetch(`${API_URL}/shelters/${shelterId}`, {
             headers: { 'Authorization': `Bearer ${token}` }
           })
         ])
@@ -297,7 +298,7 @@ function ShelterDashboard() {
                     {pet.primary_photo_url ? (
                       <div className="w-full h-40 bg-gray-50 rounded-t-lg flex items-center justify-center">
                         <img 
-                          src={`http://localhost:8000${pet.primary_photo_url}`} 
+                          src={`${API_URL}${pet.primary_photo_url}`} 
                           alt={pet.name}
                           className="max-w-full max-h-full object-contain"
                         />

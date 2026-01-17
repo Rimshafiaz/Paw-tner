@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import NotificationBanner from '../../components/NotificationBanner'
 import adopterPawtnerImage from '../../assets/adopter paw-tner.jpg'
+import API_URL from '../../config/api'
 
 function PetDetail() {
   const { petId } = useParams()
@@ -54,12 +55,12 @@ function PetDetail() {
     try {
       setLoading(true)
       
-      const petResponse = await fetch(`http://localhost:8000/pets/${petId}`)
+      const petResponse = await fetch(`${API_URL}/pets/${petId}`)
       if (petResponse.ok) {
         const petData = await petResponse.json()
         setPet(petData)
         
-        const contactResponse = await fetch(`http://localhost:8000/pets/${petId}/contact`)
+        const contactResponse = await fetch(`${API_URL}/pets/${petId}/contact`)
         if (contactResponse.ok) {
           const contactData = await contactResponse.json()
           setShelter(contactData.shelter)
@@ -86,7 +87,7 @@ function PetDetail() {
         return
       }
 
-      const response = await fetch(`http://localhost:8000/users/${userId}/favorites`, {
+      const response = await fetch(`${API_URL}/users/${userId}/favorites`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -121,7 +122,7 @@ function PetDetail() {
       }
 
       const method = isFavorite ? 'DELETE' : 'POST'
-      const response = await fetch(`http://localhost:8000/users/${userId}/favorites/${petId}`, {
+      const response = await fetch(`${API_URL}/users/${userId}/favorites/${petId}`, {
         method,
         headers: {
           'Authorization': `Bearer ${token}`
@@ -157,7 +158,7 @@ function PetDetail() {
 
   const getImageUrl = (photoUrl) => {
     if (!photoUrl) return null
-    return photoUrl.startsWith('http') ? photoUrl : `http://localhost:8000${photoUrl}`
+    return photoUrl.startsWith('http') ? photoUrl : `${API_URL}${photoUrl}`
   }
 
   if (loading) {

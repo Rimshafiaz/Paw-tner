@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import API_URL from '../config/api'
 
 const AuthContext = createContext()
 
@@ -38,8 +39,8 @@ export function AuthProvider({ children }) {
       const userType = payload.user_type
       
       const endpoint = userType === 'shelter' 
-        ? `http://localhost:8000/shelters/${userId}/stats`
-        : `http://localhost:8000/users/${userId}`
+        ? `${API_URL}/shelters/${userId}/stats`
+        : `${API_URL}/users/${userId}`
       
       const response = await fetch(endpoint, {
         headers: {

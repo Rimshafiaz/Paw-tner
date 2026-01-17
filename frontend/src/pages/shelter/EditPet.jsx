@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import NotificationBanner from '../../components/NotificationBanner'
 import PhotoUpload from '../../components/PhotoUpload'
 import shelterBg from '../../assets/paw-tner_shelter.jpg'
+import API_URL from '../../config/api'
 
 function EditPet() {
   const navigate = useNavigate()
@@ -66,7 +67,7 @@ function EditPet() {
   const fetchPetData = async () => {
     try {
       const token = localStorage.getItem('auth_token')
-      const response = await fetch(`http://localhost:8000/pets/${petId}`, {
+      const response = await fetch(`${API_URL}/pets/${petId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
 
@@ -163,7 +164,7 @@ function EditPet() {
         adoption_fee: parseFloat(formData.adoption_fee)
       }
 
-      const response = await fetch(`http://localhost:8000/pets/${petId}`, {
+      const response = await fetch(`${API_URL}/pets/${petId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

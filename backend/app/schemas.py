@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 from typing import Optional, List
 from datetime import datetime
 from .models import PetSize, PetType, AdoptionStatus, ActivityLevel, HouseType, UserRole
@@ -156,6 +156,13 @@ class ShelterCreate(ShelterBase):
 
 class ShelterRegister(ShelterBase):
     password: str
+    
+    @field_validator('password')
+    @classmethod
+    def validate_password(cls, v):
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters long')
+        return v
 
 class Shelter(ShelterBase):
     id: int
@@ -179,6 +186,13 @@ class UserCreate(BaseModel):
     zip_code: Optional[str] = None
     country: Optional[str] = None
     role: Optional[UserRole] = UserRole.ADOPTER
+    
+    @field_validator('password')
+    @classmethod
+    def validate_password(cls, v):
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters long')
+        return v
 
 class UserLogin(BaseModel):
     email: EmailStr

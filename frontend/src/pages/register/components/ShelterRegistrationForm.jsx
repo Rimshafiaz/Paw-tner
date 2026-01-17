@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { validateEmail } from '../../../utils/validation'
 import NotificationBanner from '../../../components/NotificationBanner'
 import shelterBg from '../../../assets/paw-tner_shelter.jpg'
+import API_URL from '../../../config/api'
 
 function ShelterRegistrationForm() {
   const [formData, setFormData] = useState({
@@ -78,7 +79,7 @@ function ShelterRegistrationForm() {
         country: formData.country
       }
 
-      const response = await fetch('http://localhost:8000/shelters/register', {
+      const response = await fetch(`${API_URL}/shelters/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

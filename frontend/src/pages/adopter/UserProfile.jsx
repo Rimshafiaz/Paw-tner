@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import NotificationBanner from '../../components/NotificationBanner'
 import adopterPawtnerImage from '../../assets/adopter paw-tner.jpg'
+import API_URL from '../../config/api'
 
 function UserProfile() {
   const navigate = useNavigate()
@@ -55,7 +56,7 @@ function UserProfile() {
         return
       }
 
-      const response = await fetch(`http://localhost:8000/users/${userId}/preferences`, {
+      const response = await fetch(`${API_URL}/users/${userId}/preferences`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
 
@@ -132,7 +133,7 @@ function UserProfile() {
         preferred_age_max: formData.preferred_age_max ? parseInt(formData.preferred_age_max) : null
       }
 
-      const response = await fetch(`http://localhost:8000/users/${userId}/preferences`, {
+      const response = await fetch(`${API_URL}/users/${userId}/preferences`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import pawtnerLoveImage from '../assets/paw-tner love.jpg'
+import API_URL from '../config/api'
 
 function Home() {
   const navigate = useNavigate()
@@ -35,7 +36,7 @@ function Home() {
       if (filters.state) params.append('state', filters.state)
       if (filters.pet_type) params.append('pet_type', filters.pet_type)
 
-      const response = await fetch(`http://localhost:8000/pets?${params}`)
+      const response = await fetch(`${API_URL}/pets?${params}`)
       if (response.ok) {
         const data = await response.json()
         setFeaturedPets(Array.isArray(data) ? data : data.pets || [])
@@ -73,7 +74,7 @@ function Home() {
 
   const getImageUrl = (photoUrl) => {
     if (!photoUrl) return null
-    return photoUrl.startsWith('http') ? photoUrl : `http://localhost:8000${photoUrl}`
+    return photoUrl.startsWith('http') ? photoUrl : `${API_URL}${photoUrl}`
   }
 
   return (

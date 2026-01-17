@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import NotificationBanner from '../../components/NotificationBanner'
 import shelterBg from '../../assets/paw-tner_shelter.jpg'
+import API_URL from '../../config/api'
 
 function ManagePets() {
   const navigate = useNavigate()
@@ -30,7 +31,7 @@ function ManagePets() {
       if (!token) return
 
       const shelterId = currentUser?.allUserData?.user_id || currentUser?.allUserData?.id
-      const response = await fetch(`http://localhost:8000/pets?shelter_id=${shelterId}`, {
+      const response = await fetch(`${API_URL}/pets?shelter_id=${shelterId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
 
@@ -48,7 +49,7 @@ function ManagePets() {
   const handleStatusChange = async (petId, newStatus) => {
     try {
       const token = localStorage.getItem('auth_token')
-      const response = await fetch(`http://localhost:8000/pets/${petId}`, {
+      const response = await fetch(`${API_URL}/pets/${petId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -74,7 +75,7 @@ function ManagePets() {
 
     try {
       const token = localStorage.getItem('auth_token')
-      const response = await fetch(`http://localhost:8000/pets/${deleteModal.pet.id}`, {
+      const response = await fetch(`${API_URL}/pets/${deleteModal.pet.id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       })
@@ -175,7 +176,7 @@ function ManagePets() {
                         <div className="flex items-center">
                           {pet.primary_photo_url ? (
                             <img 
-                              src={`http://localhost:8000${pet.primary_photo_url}`} 
+                              src={`${API_URL}${pet.primary_photo_url}`} 
                               alt={pet.name}
                               className="w-16 h-16 rounded-xl object-cover mr-4"
                             />

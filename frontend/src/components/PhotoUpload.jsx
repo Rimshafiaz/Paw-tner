@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import API_URL from '../config/api'
 
 function PhotoUpload({ petId, currentPhotoUrl, onPhotoUploaded, onError }) {
   const [dragActive, setDragActive] = useState(false)
@@ -110,7 +111,7 @@ function PhotoUpload({ petId, currentPhotoUrl, onPhotoUploaded, onError }) {
         }
       }
       
-      xhr.open('POST', `http://localhost:8000/pets/${petId}/upload-photo`)
+      xhr.open('POST', `${API_URL}/pets/${petId}/upload-photo`)
       xhr.setRequestHeader('Authorization', `Bearer ${token}`)
       xhr.send(formData)
       
@@ -141,7 +142,7 @@ function PhotoUpload({ petId, currentPhotoUrl, onPhotoUploaded, onError }) {
     try {
       const token = localStorage.getItem('auth_token')
       
-      const response = await fetch(`http://localhost:8000/pets/${petId}`, {
+      const response = await fetch(`${API_URL}/pets/${petId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -178,7 +179,7 @@ function PhotoUpload({ petId, currentPhotoUrl, onPhotoUploaded, onError }) {
         <div className="relative">
           <div className="w-full h-64 rounded-xl overflow-hidden bg-gray-100 border-2 border-gray-200">
             <img 
-              src={preview.startsWith('/uploads') ? `http://localhost:8000${preview}` : preview}
+              src={preview.startsWith('/uploads') ? `${API_URL}${preview}` : preview}
               alt="Pet preview"
               className="w-full h-full object-cover"
             />
