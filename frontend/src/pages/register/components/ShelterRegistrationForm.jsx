@@ -126,6 +126,7 @@ function ShelterRegistrationForm() {
         <NotificationBanner 
           notification={notification} 
           onClose={() => setNotification({ message: '', type: '', show: false })}
+          userType="shelter"
         />
         
         <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-4 md:p-8 border border-secondary/20">

@@ -126,6 +126,7 @@ function AdopterRegistrationForm() {
       <NotificationBanner 
         notification={notification} 
         onClose={() => setNotification({ message: '', type: '', show: false })}
+        userType="adopter"
       />
       
 

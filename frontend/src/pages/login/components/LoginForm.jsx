@@ -118,6 +118,7 @@ function LoginForm() {
       <NotificationBanner 
         notification={notification} 
         onClose={() => setNotification({ message: '', type: '', show: false })}
+        userType={formData.userType}
       />
       
       <div className="bg-white rounded-2xl shadow-lg p-4 md:p-8">

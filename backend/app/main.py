@@ -324,7 +324,10 @@ def get_pets(
             size=limit
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="An error occurred. Please try again.")
 
 @app.get("/pets/{pet_id}", response_model=schemas.Pet)
 def get_pet(pet_id: int, db: Session = Depends(get_db)):
@@ -334,8 +337,11 @@ def get_pet(pet_id: int, db: Session = Depends(get_db)):
         return services.PetService.get_pet_by_id(db=db, pet_id=pet_id)
     except ValueError as e: 
         raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:   
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        print(f"Error in create_user: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="An error occurred while creating your account. Please try again.")
 
 @app.get("/pets/{pet_id}/contact", response_model=schemas.PetWithContact)
 def get_pet_with_contact(pet_id: int, db: Session = Depends(get_db)):
@@ -345,7 +351,10 @@ def get_pet_with_contact(pet_id: int, db: Session = Depends(get_db)):
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="An error occurred. Please try again.")
 
 @app.post("/pets", response_model=schemas.Pet)
 def create_pet(
@@ -411,8 +420,11 @@ def create_pet(
         
     except ValueError as e:  
         raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:  
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="An error occurred. Please try again.")
 
 @app.put("/pets/{pet_id}", response_model=schemas.Pet)
 def update_pet(pet_id: int, pet_update: schemas.PetUpdate, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
@@ -434,8 +446,11 @@ def update_pet(pet_id: int, pet_update: schemas.PetUpdate, db: Session = Depends
         return result
     except ValueError as e:  
         raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:  
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="An error occurred. Please try again.")
 
 @app.delete("/pets/{pet_id}")
 def delete_pet(pet_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
@@ -456,8 +471,11 @@ def delete_pet(pet_id: int, db: Session = Depends(get_db), current_user=Depends(
         return services.PetService.delete_pet(db=db, pet_id=pet_id)
     except ValueError as e: 
         raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:   
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        print(f"Error in create_user: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="An error occurred while creating your account. Please try again.")
 
 @app.post("/pets/{pet_id}/upload-photo")
 def upload_pet_photo(pet_id: int, file: UploadFile = File(...), db: Session = Depends(get_db), current_user=Depends(get_current_user)):
@@ -530,7 +548,10 @@ def upload_pet_photo(pet_id: int, file: UploadFile = File(...), db: Session = De
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="An error occurred. Please try again.")
 
 @app.delete("/pets/{pet_id}/delete-photo")
 def delete_pet_photo(pet_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
@@ -567,7 +588,10 @@ def delete_pet_photo(pet_id: int, db: Session = Depends(get_db), current_user=De
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="An error occurred. Please try again.")
 
 # User Endpoints
 @app.post("/users", response_model=schemas.User)
@@ -584,8 +608,11 @@ def create_user(request: Request, user: schemas.UserCreate, db: Session = Depend
         if 'unique' in error_str.lower() or 'duplicate' in error_str.lower():
             raise HTTPException(status_code=400, detail="An account with this email already exists. Please use a different email or try logging in.")
         raise HTTPException(status_code=400, detail="A database constraint was violated. Please check your input.")
-    except Exception as e:   
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        print(f"Error in create_user: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="An error occurred while creating your account. Please try again.")
 
 @app.post("/login", response_model=schemas.TokenResponse)
 @limiter.limit("5/minute")
@@ -642,8 +669,11 @@ def get_user(user_id: int, db: Session = Depends(get_db), current_user=Depends(g
         return services.UserService.get_user_by_id(db=db, user_id=user_id)
     except ValueError as e: 
         raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:   
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        print(f"Error in create_user: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="An error occurred while creating your account. Please try again.")
 
 
 @app.get("/users/{user_id}/preferences", response_model=schemas.User)
@@ -663,8 +693,11 @@ def get_user_preferences(
         return services.UserService.get_user_by_id(db=db, user_id=user_id)
     except ValueError as e: 
         raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:   
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        print(f"Error in create_user: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="An error occurred while creating your account. Please try again.")
 
 @app.put("/users/{user_id}/preferences", response_model=schemas.User)
 def update_user_preferences(
@@ -689,8 +722,11 @@ def update_user_preferences(
         )
     except ValueError as e:    
         raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:  
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="An error occurred. Please try again.")
     
 
 
@@ -709,8 +745,11 @@ def get_user_profile_completeness(user_id: int, db: Session = Depends(get_db), c
         return services.UserService.get_profile_completeness(db=db, user_id=user_id)
     except ValueError as e: 
         raise HTTPException(status_code=404, detail=str(e))
-    except Exception as e:  
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="An error occurred. Please try again.")
 
 @app.get("/users/{user_id}/matches")
 def get_user_matches(user_id: int, limit: int = 20, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
@@ -729,8 +768,11 @@ def get_user_matches(user_id: int, limit: int = 20, db: Session = Depends(get_db
         return JSONResponse(content=jsonable_encoder(result))
     except ValueError as e:  
         raise HTTPException(status_code=400, detail=str(e))
-    except Exception as e:   
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        print(f"Error in create_user: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="An error occurred while creating your account. Please try again.")
 
 
 @app.post("/users/{user_id}/favorites/{pet_id}")
@@ -748,7 +790,10 @@ def add_favorite(user_id: int, pet_id: int, db: Session = Depends(get_db), curre
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, str(e))
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(500, "An error occurred. Please try again.")
 
 @app.delete("/users/{user_id}/favorites/{pet_id}")
 def remove_favorite(user_id: int, pet_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
@@ -764,7 +809,10 @@ def remove_favorite(user_id: int, pet_id: int, db: Session = Depends(get_db), cu
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, str(e))
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(500, "An error occurred. Please try again.")
 
 @app.get("/users/{user_id}/favorites")
 def get_user_favorites(user_id: int, skip: int = 0, limit: int = 20, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
@@ -786,7 +834,10 @@ def get_user_favorites(user_id: int, skip: int = 0, limit: int = 20, db: Session
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, str(e))
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(500, "An error occurred. Please try again.")
 
 @app.get("/shelters")
 def get_shelters(skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
@@ -795,7 +846,10 @@ def get_shelters(skip: int = 0, limit: int = 20, db: Session = Depends(get_db)):
         shelters = services.ShelterService.get_shelters(db=db, skip=skip, limit=limit)
         return {"shelters": shelters}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="An error occurred. Please try again.")
 
 @app.get("/shelters/{shelter_id}/stats")
 def get_shelter_stats(shelter_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
@@ -850,7 +904,10 @@ def get_shelter_stats(shelter_id: int, db: Session = Depends(get_db), current_us
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, str(e))
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(500, "An error occurred. Please try again.")
 
 
 @app.post("/shelters/register", response_model=schemas.Shelter)
@@ -866,7 +923,10 @@ def register_shelter(request: Request, shelter: schemas.ShelterRegister, db: Ses
             raise HTTPException(status_code=400, detail="An account with this email already exists. Please use a different email or try logging in.")
         raise HTTPException(status_code=400, detail="A database constraint was violated. Please check your input.")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="An error occurred. Please try again.")
 
 @app.get("/shelters/{shelter_id}/basic")
 def get_shelter_basic_info(shelter_id: int, db: Session = Depends(get_db)):
@@ -895,7 +955,10 @@ def get_shelter_basic_info(shelter_id: int, db: Session = Depends(get_db)):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, str(e))
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(500, "An error occurred. Please try again.")
 
 @app.put("/shelters/{shelter_id}/profile")
 def update_shelter_profile(shelter_id: int, shelter_update: dict, db: Session = Depends(get_db)):
@@ -931,7 +994,10 @@ def update_shelter_profile(shelter_id: int, shelter_update: dict, db: Session = 
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, str(e))
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(500, "An error occurred. Please try again.")
 
 @app.get("/shelters/{shelter_id}", response_model=schemas.Shelter)
 def get_shelter(shelter_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
@@ -954,7 +1020,10 @@ def get_shelter(shelter_id: int, db: Session = Depends(get_db), current_user=Dep
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(500, str(e))
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(500, "An error occurred. Please try again.")
 
 @app.put("/shelters/{shelter_id}", response_model=schemas.Shelter)
 def update_shelter(shelter_id: int, shelter_update: schemas.ShelterBase, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
@@ -978,7 +1047,10 @@ def update_shelter(shelter_id: int, shelter_update: schemas.ShelterBase, db: Ses
         raise
 
     except Exception as e:
-        raise HTTPException(500, str(e))
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(500, "An error occurred. Please try again.")
 
 
 @app.put("/admin/shelters/{shelter_id}/suspend")
@@ -1050,7 +1122,10 @@ def shelter_login(request: Request, login_data: schemas.LoginRequest, db: Sessio
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Error: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="An error occurred. Please try again.")
 
 if __name__ == "__main__":
     import uvicorn

@@ -75,6 +75,12 @@ export function getUserFriendlyError(errorData, defaultMessage = 'Something went
     if (detail.includes('timeout') || detail.includes('timed out')) {
       return 'The request took too long. Please check your connection and try again.'
     }
+    if (detail.includes('database constraint') || detail.includes('constraint')) {
+      return 'The information you entered conflicts with existing data. Please check and try again.'
+    }
+    if (detail.includes('an error occurred')) {
+      return 'Something went wrong. Please try again in a moment.'
+    }
     
     return errorData.detail
   }
