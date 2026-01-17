@@ -90,21 +90,11 @@ def migrate_database():
         current_file = Path(__file__).resolve()
         backend_dir = current_file.parent.parent.resolve()
         alembic_cfg_path = backend_dir / "alembic.ini"
-        alembic_dir = backend_dir / "alembic"
         
         if not alembic_cfg_path.exists():
             return {
                 "message": "Migration failed", 
                 "error": f"Alembic config not found at {alembic_cfg_path}",
-                "current_dir": str(Path.cwd()),
-                "backend_dir": str(backend_dir),
-                "file_location": str(current_file)
-            }
-        
-        if not alembic_dir.exists():
-            return {
-                "message": "Migration failed",
-                "error": f"Alembic directory not found at {alembic_dir}",
                 "backend_dir": str(backend_dir)
             }
         
@@ -115,8 +105,10 @@ def migrate_database():
             alembic_cfg = Config(str(alembic_cfg_path))
             
             database_url = os.getenv("DATABASE_URL")
-            if database_url:
-                alembic_cfg.set_main_option("sqlalchemy.url", database_url)
+            if not database_url:
+                return {"message": "Migration failed", "error": "DATABASE_URL not set"}
+            
+            alembic_cfg.set_main_option("sqlalchemy.url", database_url)
             
             command.upgrade(alembic_cfg, "head")
             
@@ -133,8 +125,7 @@ def migrate_database():
             "message": "Failed to run migrations", 
             "error": str(e),
             "error_type": type(e).__name__,
-            "traceback": traceback.format_exc(),
-            "current_dir": str(Path.cwd()) if 'Path' in dir() else "unknown"
+            "traceback": traceback.format_exc()
         }
 
 @app.post("/recreate-tables")
