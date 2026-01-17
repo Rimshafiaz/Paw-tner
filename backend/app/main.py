@@ -419,6 +419,17 @@ def create_pet(
         pet_dict = pet.dict()
         pet_dict["shelter_id"] = current_user.id
         
+        from .models import PetType, PetSize, ActivityLevel, AdoptionStatus
+        
+        if isinstance(pet_dict.get("pet_type"), str):
+            pet_dict["pet_type"] = PetType(pet_dict["pet_type"].lower())
+        if isinstance(pet_dict.get("size"), str):
+            pet_dict["size"] = PetSize(pet_dict["size"].lower())
+        if isinstance(pet_dict.get("activity_level"), str):
+            pet_dict["activity_level"] = ActivityLevel(pet_dict["activity_level"].lower())
+        if isinstance(pet_dict.get("adoption_status"), str):
+            pet_dict["adoption_status"] = AdoptionStatus(pet_dict["adoption_status"].lower())
+        
         pet_with_shelter = schemas.PetCreate(**pet_dict)
         result = services.PetService.create_pet(db=db, pet_data=pet_with_shelter)
         return result
