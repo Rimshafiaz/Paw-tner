@@ -416,7 +416,12 @@ def create_pet(
                     }
                 )
         
-        return services.PetService.create_pet(db=db, pet_data=pet)
+        pet_dict = pet.dict()
+        pet_dict["shelter_id"] = current_user.id
+        
+        pet_with_shelter = schemas.PetCreate(**pet_dict)
+        result = services.PetService.create_pet(db=db, pet_data=pet_with_shelter)
+        return result
         
     except ValueError as e:  
         raise HTTPException(status_code=400, detail=str(e))

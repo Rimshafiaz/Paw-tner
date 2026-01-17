@@ -260,10 +260,11 @@ class PetService:
             if adoption_fee > 10000:
                 raise ValueError("Adoption fee seems unrealistic (maximum $10,000)")
         
-        if temperament is not None:
-            if len(temperament.strip()) < 3:
+        if temperament is not None and temperament:
+            temperament_str = str(temperament).strip()
+            if len(temperament_str) < 3:
                 raise ValueError("Temperament description must be at least 3 characters")
-            if len(temperament) > 1000:
+            if len(temperament_str) > 1000:
                 raise ValueError("Temperament description too long (maximum 1000 characters)")
     
     @staticmethod
