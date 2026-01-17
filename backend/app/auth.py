@@ -17,16 +17,20 @@ if not SECRET_KEY:
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-# bcrypt_sha256: hashes with SHA-256 first (32 bytes), then bcrypt. Avoids bcrypt's 72-byte limit.
-# bcrypt: kept so existing hashes in the DB still verify.
-pwd_context = CryptContext(schemes=["bcrypt_sha256", "bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def _truncate_72(s: str) -> str:
+    b = s.encode("utf-8")
+    if len(b) <= 72:
+        return s
+    return b[:72].decode("utf-8", errors="ignore")
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    return pwd_context.hash(_truncate_72(password))
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     try:
-        return pwd_context.verify(plain_password, hashed_password)
+        return pwd_context.verify(_truncate_72(plain_password), hashed_password)
     except Exception as e:
         print(f"Password verification error: {e}")
         return False
