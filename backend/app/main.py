@@ -87,32 +87,54 @@ def migrate_database():
         import os
         from pathlib import Path
         
-        backend_dir = Path(__file__).parent.parent
+        current_file = Path(__file__).resolve()
+        backend_dir = current_file.parent.parent.resolve()
         alembic_cfg_path = backend_dir / "alembic.ini"
+        alembic_dir = backend_dir / "alembic"
         
         if not alembic_cfg_path.exists():
-            return {"message": "Migration failed", "error": f"Alembic config not found at {alembic_cfg_path}"}
+            return {
+                "message": "Migration failed", 
+                "error": f"Alembic config not found at {alembic_cfg_path}",
+                "current_dir": str(Path.cwd()),
+                "backend_dir": str(backend_dir),
+                "file_location": str(current_file)
+            }
         
-        alembic_cfg = Config(str(alembic_cfg_path))
+        if not alembic_dir.exists():
+            return {
+                "message": "Migration failed",
+                "error": f"Alembic directory not found at {alembic_dir}",
+                "backend_dir": str(backend_dir)
+            }
         
-        database_url = os.getenv("DATABASE_URL")
-        if database_url:
-            alembic_cfg.set_main_option("sqlalchemy.url", database_url)
-        
-        os.chdir(str(backend_dir))
-        
-        command.upgrade(alembic_cfg, "head")
-        
-        return {
-            "message": "Database migrations applied successfully!",
-            "note": "This only adds new tables/columns. Your existing data is safe."
-        }
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(str(backend_dir))
+            
+            alembic_cfg = Config(str(alembic_cfg_path))
+            
+            database_url = os.getenv("DATABASE_URL")
+            if database_url:
+                alembic_cfg.set_main_option("sqlalchemy.url", database_url)
+            
+            command.upgrade(alembic_cfg, "head")
+            
+            return {
+                "message": "Database migrations applied successfully!",
+                "note": "This only adds new tables/columns. Your existing data is safe."
+            }
+        finally:
+            os.chdir(original_cwd)
+            
     except Exception as e:
         import traceback
         return {
             "message": "Failed to run migrations", 
             "error": str(e),
-            "traceback": traceback.format_exc()
+            "error_type": type(e).__name__,
+            "traceback": traceback.format_exc(),
+            "current_dir": str(Path.cwd()) if 'Path' in dir() else "unknown"
         }
 
 @app.post("/recreate-tables")
