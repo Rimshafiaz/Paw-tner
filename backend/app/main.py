@@ -28,6 +28,18 @@ app = FastAPI(
 allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "")
 allowed_origins = [origin.strip() for origin in allowed_origins_env.split(",") if origin.strip()]
 
+# Fix URLs missing protocol and remove trailing slashes
+fixed_origins = []
+for origin in allowed_origins:
+    if origin:
+        # Remove trailing slash
+        origin = origin.rstrip('/')
+        # Add https:// if protocol is missing
+        if not origin.startswith(("http://", "https://")):
+            origin = f"https://{origin}"
+        fixed_origins.append(origin)
+allowed_origins = fixed_origins
+
 if not allowed_origins:
     allow_origins_list = [
         "https://paw-tner-qr3m.vercel.app",
