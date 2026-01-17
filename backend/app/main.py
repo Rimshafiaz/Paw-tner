@@ -77,6 +77,15 @@ def read_root():
 def health_check():
     return {"status": "healthy"}
 
+@app.get("/cors-debug", tags=["Debug"])
+def cors_debug():
+    """Debug endpoint to check CORS configuration"""
+    return {
+        "allowed_origins": allow_origins_list,
+        "credentials_enabled": use_credentials,
+        "env_value": os.getenv("ALLOWED_ORIGINS", "NOT SET")
+    }
+
 @app.get("/cors-test", tags=["Debug"])
 def cors_test():
     """Test endpoint to verify CORS is working"""
