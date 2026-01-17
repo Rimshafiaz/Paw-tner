@@ -82,37 +82,38 @@ def create_database_tables():
 def migrate_database():
     """Apply pending database migrations safely - only adds new tables/columns, never deletes data"""
     try:
-        import subprocess
+        from alembic import command
+        from alembic.config import Config
         import os
         from pathlib import Path
         
         backend_dir = Path(__file__).parent.parent
-        os.chdir(backend_dir)
+        alembic_cfg_path = backend_dir / "alembic.ini"
         
-        os.environ['DATABASE_URL'] = os.getenv('DATABASE_URL', '')
+        if not alembic_cfg_path.exists():
+            return {"message": "Migration failed", "error": f"Alembic config not found at {alembic_cfg_path}"}
         
-        result = subprocess.run(
-            ["alembic", "upgrade", "head"], 
-            cwd=str(backend_dir),
-            capture_output=True, 
-            text=True,
-            env=os.environ.copy()
-        )
+        alembic_cfg = Config(str(alembic_cfg_path))
         
-        if result.returncode == 0:
-            return {
-                "message": "Database migrations applied successfully!",
-                "output": result.stdout,
-                "note": "This only adds new tables/columns. Your existing data is safe."
-            }
-        else:
-            return {
-                "message": "Migration failed", 
-                "error": result.stderr,
-                "stdout": result.stdout
-            }
+        database_url = os.getenv("DATABASE_URL")
+        if database_url:
+            alembic_cfg.set_main_option("sqlalchemy.url", database_url)
+        
+        os.chdir(str(backend_dir))
+        
+        command.upgrade(alembic_cfg, "head")
+        
+        return {
+            "message": "Database migrations applied successfully!",
+            "note": "This only adds new tables/columns. Your existing data is safe."
+        }
     except Exception as e:
-        return {"message": "Failed to run migrations", "error": str(e)}
+        import traceback
+        return {
+            "message": "Failed to run migrations", 
+            "error": str(e),
+            "traceback": traceback.format_exc()
+        }
 
 @app.post("/recreate-tables")
 def recreate_database_tables():
