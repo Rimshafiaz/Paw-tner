@@ -142,6 +142,20 @@ def fix_pet_sequence(db: Session = Depends(get_db)):
             SELECT setval('pets_id_seq', COALESCE((SELECT MAX(id) FROM pets), 1), true);
         """))
         db.commit()
+        new_val = result.scalar()
+        return {"message": "Pet sequence fixed successfully!", "new_sequence_value": new_val}
+    except Exception as e:
+        db.rollback()
+        return {"message": "Failed to fix sequence", "error": str(e)}
+
+@app.post("/fix-pet-sequence", tags=["Database"])
+def fix_pet_sequence(db: Session = Depends(get_db)):
+    """Fix PostgreSQL sequence for pets.id if it's out of sync"""
+    try:
+        result = db.execute(text("""
+            SELECT setval('pets_id_seq', COALESCE((SELECT MAX(id) FROM pets), 1), true);
+        """))
+        db.commit()
         return {"message": "Pet sequence fixed successfully!"}
     except Exception as e:
         db.rollback()
@@ -447,13 +461,13 @@ def create_pet(
         
         # Check for specific database errors and return user-friendly messages
         if "UniqueViolation" in error_str or "duplicate key" in error_str.lower():
-            if "pets_pkey" in error_str or "id" in error_str.lower():
-                return HTTPException(
+            if "pets_pkey" in error_str or ("id" in error_str.lower() and "already exists" in error_str.lower()):
+                raise HTTPException(
                     status_code=500, 
-                    detail="A database error occurred. Please try again in a moment."
+                    detail="A database error occurred. Please contact support or try again later."
                 )
             else:
-                return HTTPException(
+                raise HTTPException(
                     status_code=400,
                     detail="A pet with similar information already exists. Please check your input."
                 )
