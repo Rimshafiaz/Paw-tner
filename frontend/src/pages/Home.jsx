@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import pawtnerLoveImage from '../assets/paw-tner love.jpg'
 import API_URL from '../config/api'
+import { useAuth } from '../contexts/AuthContext'
 
 function Home() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { isLoggedIn } = useAuth()
   const [featuredPets, setFeaturedPets] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchLocation, setSearchLocation] = useState('')
@@ -357,7 +359,11 @@ function Home() {
                     <button 
                       onClick={(e) => {
                         e.stopPropagation()
-                        navigate(`/pets/${pet.id}`)
+                        if (isLoggedIn) {
+                          navigate(`/pets/${pet.id}`)
+                        } else {
+                          navigate('/login', { state: { redirectTo: `/pets/${pet.id}` } })
+                        }
                       }}
                       className={`w-full bg-gradient-to-r from-orange-400 to-amber-500 text-white ${mobileViewMode === 'double' ? 'px-2 py-1 text-xs' : 'px-4 py-2 text-sm'} md:px-6 md:py-3 md:text-sm rounded-2xl font-bold hover:scale-105 transition-all duration-200 shadow-lg border-2 border-orange-300 group-hover:from-orange-500 group-hover:to-amber-600`}
                       aria-label={`View details for ${pet.name}`}

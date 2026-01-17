@@ -99,15 +99,13 @@ function LoginForm() {
         }, 1000)
         
       } else {
-        const error = await response.json()
-        showNotification(error.detail || 'Invalid email or password. Please try again.', 'error')
+        const errorData = await response.json()
+        const friendlyMessage = getUserFriendlyError(errorData, 'Invalid email or password. Please try again.')
+        showNotification(friendlyMessage, 'error')
       }
     } catch (error) {
-      if (error.name === 'AbortError') {
-        showNotification('Request timeout. Please check your connection and try again.', 'error')
-      } else {
-        showNotification('Connection failed. Please check your internet and try again.', 'error')
-      }
+      const friendlyMessage = getNetworkError(error)
+      showNotification(friendlyMessage, 'error')
     } finally {
       setIsSubmitting(false)
     }

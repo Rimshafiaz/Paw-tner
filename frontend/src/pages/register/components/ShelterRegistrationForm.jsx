@@ -3,6 +3,7 @@ import { validateEmail } from '../../../utils/validation'
 import NotificationBanner from '../../../components/NotificationBanner'
 import shelterBg from '../../../assets/paw-tner_shelter.jpg'
 import API_URL from '../../../config/api'
+import { getUserFriendlyError, getNetworkError } from '../../../utils/errorMessages'
 
 function ShelterRegistrationForm() {
   const [formData, setFormData] = useState({
@@ -97,15 +98,13 @@ function ShelterRegistrationForm() {
           window.location.href = '/login'
         }, 2000)
       } else {
-        const error = await response.json()
-        showNotification(error.detail || 'Registration failed. Please check your information and try again.', 'error')
+        const errorData = await response.json()
+        const friendlyMessage = getUserFriendlyError(errorData, 'Registration failed. Please check your information and try again.')
+        showNotification(friendlyMessage, 'error')
       }
     } catch (error) {
-      if (error.name === 'AbortError') {
-        showNotification('Request timeout. Please check your connection and try again.', 'error')
-      } else {
-        showNotification('Connection failed. Please check your internet and try again.', 'error')
-      }
+      const friendlyMessage = getNetworkError(error)
+      showNotification(friendlyMessage, 'error')
     } finally {
       setIsSubmitting(false)
     }

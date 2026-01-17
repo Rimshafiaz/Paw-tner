@@ -8,7 +8,7 @@ import API_URL from '../../config/api'
 function PetDetail() {
   const { petId } = useParams()
   const navigate = useNavigate()
-  const { currentUser } = useAuth()
+  const { currentUser, isLoggedIn, isLoading } = useAuth()
   
   const [pet, setPet] = useState(null)
   const [shelter, setShelter] = useState(null)
@@ -16,6 +16,12 @@ function PetDetail() {
   const [notification, setNotification] = useState({ message: '', type: '', show: false })
   const [isFavorite, setIsFavorite] = useState(false)
   const [favoritesLoading, setFavoritesLoading] = useState(false)
+
+  useEffect(() => {
+    if (!isLoading && !isLoggedIn) {
+      navigate('/login', { state: { redirectTo: `/pets/${petId}` } })
+    }
+  }, [isLoading, isLoggedIn, navigate, petId])
 
   const showNotification = (message, type) => {
     setNotification({ message, type, show: true })

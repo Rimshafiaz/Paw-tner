@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { validateEmail } from '../../../utils/validation'
 import NotificationBanner from '../../../components/NotificationBanner'
 import API_URL from '../../../config/api'
+import { getUserFriendlyError, getNetworkError } from '../../../utils/errorMessages'
 
 function AdopterRegistrationForm() {
   const [formData, setFormData] = useState({
@@ -74,12 +75,11 @@ function AdopterRegistrationForm() {
         username: username,
         password: formData.password,
         full_name: formData.full_name,
-        phone: formData.phone,
-        city: formData.city,
-        state: formData.state,
-        zip_code: formData.zip_code,
-        country: formData.country,
-        role: 'adopter'
+        phone: formData.phone || null,
+        city: formData.city || null,
+        state: formData.state || null,
+        zip_code: formData.zip_code || null,
+        country: formData.country || null
       }
 
       console.log('API_URL:', API_URL)
@@ -107,18 +107,13 @@ function AdopterRegistrationForm() {
           window.location.href = '/login'
         }, 2000)
       } else {
-        const error = await response.json()
-        showNotification(error.detail || 'Registration failed. Please check your information and try again.', 'error')
+        const errorData = await response.json()
+        const friendlyMessage = getUserFriendlyError(errorData, 'Registration failed. Please check your information and try again.')
+        showNotification(friendlyMessage, 'error')
       }
     } catch (error) {
-      console.error('Registration error:', error)
-      console.error('Error name:', error.name)
-      console.error('Error message:', error.message)
-      if (error.name === 'AbortError') {
-        showNotification('Request timeout. Please check your connection and try again.', 'error')
-      } else {
-        showNotification(`Connection failed: ${error.message}. Check console for details.`, 'error')
-      }
+      const friendlyMessage = getNetworkError(error)
+      showNotification(friendlyMessage, 'error')
     } finally {
       setIsSubmitting(false)
     }
@@ -207,12 +202,12 @@ function AdopterRegistrationForm() {
                 required
               />
             </div>
-            <div>
+            <div className="relative">
               <select
                 name="state"
                 value={formData.state}
                 onChange={handleChange}
-                className="w-full px-4 py-4 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-colors"
+                className="w-full px-4 py-4 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-colors appearance-none cursor-pointer pr-10"
                 required
               >
                 <option value="">Select Province</option>
@@ -224,6 +219,11 @@ function AdopterRegistrationForm() {
                 <option value="Azad Kashmir">Azad Kashmir</option>
                 <option value="Islamabad Capital Territory">Islamabad Capital Territory</option>
               </select>
+              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
             </div>
             <div>
               <input
