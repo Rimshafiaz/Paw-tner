@@ -565,16 +565,31 @@ def login(request: Request, login_data: schemas.LoginRequest, db: Session = Depe
         
         access_token = services.UserService.create_user_token(user)
         
+        user_dict = {
+            "id": user.id,
+            "email": user.email,
+            "username": user.username,
+            "full_name": user.full_name,
+            "phone": user.phone,
+            "role": user.role.value if user.role else "adopter",
+            "basic_preferences_complete": user.basic_preferences_complete or False,
+            "extended_preferences_complete": user.extended_preferences_complete or False,
+            "created_at": user.created_at
+        }
+        
         return {
             "access_token": access_token,
             "token_type": "bearer",
-            "user": user
+            "user": user_dict
         }
         
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        import traceback
+        print(f"Login error: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(status_code=500, detail="An error occurred during login. Please try again.")
 
 @app.get("/users/{user_id}", response_model=schemas.User)
 def get_user(user_id: int, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
