@@ -111,46 +111,79 @@ def migrate_database():
             
             engine = create_engine(database_url)
             
+            alembic_cfg = Config(str(alembic_cfg_path))
+            script_location = backend_dir / "alembic"
+            alembic_cfg.set_main_option("script_location", str(script_location))
+            alembic_cfg.set_main_option("sqlalchemy.url", database_url)
+            
+            # Check if tables already exist
             with engine.connect() as connection:
                 inspector = inspect(engine)
                 existing_tables = inspector.get_table_names()
                 
-                if 'alembic_version' not in existing_tables:
-                    if existing_tables:
-                        with connection.begin():
-                            connection.execute(text("CREATE TABLE alembic_version (version_num VARCHAR(32) NOT NULL, CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num))"))
-                            connection.execute(text("INSERT INTO alembic_version (version_num) VALUES ('345d2c21b2af')"))
+                has_data_tables = any(table in existing_tables for table in ['users', 'shelters', 'pets', 'user_favorites'])
+                has_alembic_version = 'alembic_version' in existing_tables
+                
+                # If tables exist but alembic_version doesn't, stamp the database
+                if has_data_tables and not has_alembic_version:
+                    try:
+                        command.stamp(alembic_cfg, "head")
                         return {
                             "message": "Database already has tables. Marked migrations as applied.",
-                            "note": "Your tables already exist. If you need to add new columns, create a new migration."
+                            "note": "Your tables already exist. All migrations have been marked as complete."
+                        }
+                    except Exception as stamp_error:
+                        # Fallback: manually create alembic_version table
+                        with connection.begin():
+                            connection.execute(text("""
+                                CREATE TABLE IF NOT EXISTS alembic_version (
+                                    version_num VARCHAR(32) NOT NULL, 
+                                    CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)
+                                )
+                            """))
+                            connection.execute(text("INSERT INTO alembic_version (version_num) VALUES ('345d2c21b2af') ON CONFLICT DO NOTHING"))
+                        return {
+                            "message": "Database already has tables. Marked migrations as applied.",
+                            "note": "Your tables already exist. All migrations have been marked as complete."
                         }
             
-            alembic_cfg = Config(str(alembic_cfg_path))
-            alembic_cfg.attributes['connection'] = engine.connect()
-            
-            script_location = backend_dir / "alembic"
-            alembic_cfg.set_main_option("script_location", str(script_location))
+            # Try to run migrations normally
+            connection = engine.connect()
+            alembic_cfg.attributes['connection'] = connection
             
             try:
                 command.upgrade(alembic_cfg, "head")
+                connection.close()
                 return {
                     "message": "Database migrations applied successfully!",
                     "note": "This only adds new tables/columns. Your existing data is safe."
                 }
             except Exception as migration_error:
-                if "already exists" in str(migration_error) or "DuplicateTable" in str(migration_error):
-                    with engine.connect() as conn:
-                        with conn.begin():
-                            result = conn.execute(text("SELECT version_num FROM alembic_version LIMIT 1"))
-                            current_version = result.scalar()
-                            if not current_version:
-                                conn.execute(text("INSERT INTO alembic_version (version_num) VALUES ('345d2c21b2af')"))
-                            else:
-                                conn.execute(text("UPDATE alembic_version SET version_num = '345d2c21b2af'"))
-                    return {
-                        "message": "Tables already exist. Marked migrations as applied.",
-                        "note": "Your database is up to date. All migrations have been marked as complete."
-                    }
+                connection.close()
+                error_str = str(migration_error)
+                if "already exists" in error_str or "DuplicateTable" in error_str:
+                    # Tables exist but migration failed - stamp the database
+                    try:
+                        command.stamp(alembic_cfg, "head")
+                        return {
+                            "message": "Tables already exist. Marked migrations as applied.",
+                            "note": "Your database is up to date. All migrations have been marked as complete."
+                        }
+                    except Exception:
+                        # Fallback: manually create alembic_version
+                        with engine.connect() as conn:
+                            with conn.begin():
+                                conn.execute(text("""
+                                    CREATE TABLE IF NOT EXISTS alembic_version (
+                                        version_num VARCHAR(32) NOT NULL, 
+                                        CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num)
+                                    )
+                                """))
+                                conn.execute(text("INSERT INTO alembic_version (version_num) VALUES ('345d2c21b2af') ON CONFLICT DO NOTHING"))
+                        return {
+                            "message": "Tables already exist. Marked migrations as applied.",
+                            "note": "Your database is up to date. All migrations have been marked as complete."
+                        }
                 else:
                     raise migration_error
         finally:
