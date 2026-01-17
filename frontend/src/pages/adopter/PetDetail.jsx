@@ -20,8 +20,13 @@ function PetDetail() {
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {
       navigate('/login', { state: { redirectTo: `/pets/${petId}` } })
+      return
     }
-  }, [isLoading, isLoggedIn, navigate, petId])
+    if (isLoggedIn) {
+      fetchPetDetails()
+      checkIfFavorite()
+    }
+  }, [petId, currentUser, isLoggedIn, isLoading, navigate])
 
   const showNotification = (message, type) => {
     setNotification({ message, type, show: true })
@@ -40,11 +45,6 @@ function PetDetail() {
       default: return 'bg-gray-100 text-gray-800'
     }
   }
-
-  useEffect(() => {
-    fetchPetDetails()
-    checkIfFavorite()
-  }, [petId, currentUser])
 
   useEffect(() => {
     const handleVisibilityChange = () => {
