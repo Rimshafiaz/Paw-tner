@@ -106,7 +106,6 @@ class PetCRUD:
         """Create a new pet"""
         try:
             pet_dict = pet.dict()
-            print(f"Creating pet with dict: {pet_dict}")
             db_pet = models.Pet(**pet_dict)
             db.add(db_pet)
             db.commit()
@@ -114,7 +113,7 @@ class PetCRUD:
             return db_pet
         except Exception as e:
             print(f"ERROR in PetCRUD.create_pet: {type(e).__name__}: {str(e)}")
-            print(f"Pet dict keys: {list(pet_dict.keys()) if 'pet_dict' in locals() else 'N/A'}")
+            print(f"Pet data: {pet.dict() if hasattr(pet, 'dict') else 'N/A'}")
             import traceback
             traceback.print_exc()
             db.rollback()
