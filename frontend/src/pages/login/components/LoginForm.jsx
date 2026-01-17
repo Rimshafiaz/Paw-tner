@@ -5,6 +5,7 @@ import NotificationBanner from '../../../components/NotificationBanner'
 import RoleSelector from './RoleSelector'
 import { useAuth } from '../../../contexts/AuthContext'
 import API_URL from '../../../config/api'
+import { getUserFriendlyError, getNetworkError } from '../../../utils/errorMessages'
 
 function LoginForm() {
   const [formData, setFormData] = useState({
