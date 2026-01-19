@@ -18,7 +18,7 @@ class PetCRUD:
     
     @staticmethod
     def _apply_pet_filters(query, pet_type=None, size=None, adoption_status=None, shelter_id=None, 
-                          gender=None, age_min=None, age_max=None, city=None, state=None, breed=None):
+                          gender=None, age_min=None, age_max=None, city=None, state=None, breed=None, search=None):
         if pet_type:
             query = query.filter(models.Pet.pet_type == pet_type)
         if size:
@@ -27,7 +27,6 @@ class PetCRUD:
             query = query.filter(models.Pet.adoption_status == adoption_status)
         if shelter_id:
             query = query.filter(models.Pet.shelter_id == shelter_id)
-        
         
         if gender:
             query = query.filter(models.Pet.gender == gender)
@@ -38,9 +37,17 @@ class PetCRUD:
         if age_max is not None:
             query = query.filter(models.Pet.age_years <= age_max)
         
+        # Search parameter searches both name and breed
+        if search:
+            search_pattern = f"%{search}%"
+            query = query.filter(
+                (models.Pet.name.ilike(search_pattern)) |
+                (models.Pet.breed.ilike(search_pattern))
+            )
         
+        # Join Shelter only if city or state filter is needed
         if city or state:
-            query = query.join(models.Shelter)
+            query = query.join(models.Shelter, models.Pet.shelter_id == models.Shelter.id)
             if city:
                 query = query.filter(models.Shelter.city.ilike(f"%{city}%"))
             if state:
@@ -62,12 +69,13 @@ class PetCRUD:
         age_max: Optional[int] = None,
         city: Optional[str] = None,
         state: Optional[str] = None,
-        breed: Optional[str] = None
+        breed: Optional[str] = None,
+        search: Optional[str] = None
     ) -> List[models.Pet]:
         """Get pets with optional filtering"""
         query = db.query(models.Pet)
         query = PetCRUD._apply_pet_filters(query, pet_type, size, adoption_status, shelter_id,
-                                          gender, age_min, age_max, city, state, breed)
+                                          gender, age_min, age_max, city, state, breed, search)
         return query.offset(skip).limit(limit).all()
     
     @staticmethod
@@ -82,11 +90,12 @@ class PetCRUD:
         age_max: Optional[int] = None,
         city: Optional[str] = None,
         state: Optional[str] = None,
-        breed: Optional[str] = None
+        breed: Optional[str] = None,
+        search: Optional[str] = None
     ) -> int:
         query = db.query(func.count(models.Pet.id))
         query = PetCRUD._apply_pet_filters(query, pet_type, size, adoption_status, shelter_id,
-                                          gender, age_min, age_max, city, state, breed)
+                                          gender, age_min, age_max, city, state, breed, search)
         return query.scalar()
     
     @staticmethod

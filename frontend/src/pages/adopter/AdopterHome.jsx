@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import NotificationBanner from '../../components/NotificationBanner'
@@ -33,12 +33,7 @@ function AdopterHome() {
     }, 5000)
   }
 
-  useEffect(() => {
-    fetchPets()
-    fetchFavorites()
-  }, [])
-
-  const fetchPets = async (page = 1, append = false) => {
+  const fetchPets = useCallback(async (page = 1, append = false, searchValue = null) => {
     try {
       if (page === 1) {
         setLoading(true)
@@ -57,6 +52,7 @@ function AdopterHome() {
         adoption_status: 'AVAILABLE'
       })
 
+      const currentSearch = searchValue !== null ? searchValue : searchTerm
       if (selectedType) params.append('pet_type', selectedType)
       if (selectedSize) params.append('size', selectedSize)
       if (selectedGender) params.append('gender', selectedGender)
@@ -64,6 +60,7 @@ function AdopterHome() {
       if (selectedState) params.append('state', selectedState)
       if (ageRange.min) params.append('age_min', ageRange.min)
       if (ageRange.max) params.append('age_max', ageRange.max)
+      if (currentSearch.trim()) params.append('search', currentSearch.trim())
 
       const response = await fetch(`${API_URL}/pets?${params}`)
       if (response.ok) {
@@ -89,9 +86,9 @@ function AdopterHome() {
       setLoading(false)
       setLoadingMore(false)
     }
-  }
+  }, [selectedType, selectedSize, selectedGender, selectedCity, selectedState, ageRange.min, ageRange.max])
 
-  const fetchFavorites = async () => {
+  const fetchFavorites = useCallback(async () => {
     try {
       const userId = currentUser?.allUserData?.id
       const token = localStorage.getItem('auth_token')
@@ -113,7 +110,26 @@ function AdopterHome() {
     } catch (error) {
       console.error('Failed to fetch favorites:', error)
     }
-  }
+  }, [currentUser])
+
+  // Initial load
+  useEffect(() => {
+    fetchFavorites()
+  }, [])
+
+  // Refetch when filters change (excluding search which is handled separately with debounce)
+  useEffect(() => {
+    fetchPets(1, false, searchTerm)
+  }, [selectedType, selectedSize, selectedGender, selectedCity, selectedState, ageRange.min, ageRange.max, fetchPets])
+
+  // Debounce search term to avoid excessive API calls
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      fetchPets(1, false, searchTerm)
+    }, searchTerm ? 500 : 0) // Immediate if clearing, 500ms delay if typing
+
+    return () => clearTimeout(timeoutId)
+  }, [searchTerm, fetchPets])
 
   const toggleFavorite = async (petId) => {
     try {
@@ -164,15 +180,6 @@ function AdopterHome() {
     return photoUrl.startsWith('http') ? photoUrl : `${API_URL}${photoUrl}`
   }
 
-  const filteredPets = pets.filter(pet => {
-    const matchesSearch = pet.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         pet.breed?.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesSearch
-  })
-
-  useEffect(() => {
-    fetchPets()
-  }, [selectedType, selectedSize, selectedGender, selectedCity, selectedState, ageRange])
 
   return (
     <div 
@@ -259,7 +266,7 @@ function AdopterHome() {
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center justify-center bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl px-3 py-3 border-2 border-green-200 flex-1">
                   <span className="text-emerald-600 font-bold text-sm">
-                    🎯 {filteredPets.length} pets
+                    🎯 {pets.length} pets
                   </span>
                 </div>
                 <button
@@ -538,7 +545,7 @@ function AdopterHome() {
               </button>
               <div className="flex items-center justify-center bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl px-4 py-3 border-2 border-green-200">
                 <span className="text-emerald-600 font-bold">
-                  🎯 {filteredPets.length} pets found
+                  🎯 {pets.length} pets found
                 </span>
               </div>
             </div>
@@ -554,7 +561,7 @@ function AdopterHome() {
         ) : (
           <>
             <div className={`grid ${mobileViewMode === 'single' ? 'grid-cols-1' : 'grid-cols-2'} md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6 mb-8 px-6 md:px-0`}>
-              {filteredPets.map((pet) => (
+              {pets.map((pet) => (
                 <div 
                   key={pet.id} 
                   className="bg-gradient-to-br from-white to-pink-50 rounded-2xl md:rounded-3xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer hover:scale-110 hover:rotate-1 border-2 border-pink-200"
@@ -625,7 +632,7 @@ function AdopterHome() {
               ))}
             </div>
 
-            {!loading && filteredPets.length > 0 && hasMorePets && (
+            {!loading && pets.length > 0 && hasMorePets && (
               <div className="text-center mt-8 mb-8 px-4">
                 <button
                   onClick={loadMorePets}
@@ -648,7 +655,7 @@ function AdopterHome() {
               </div>
             )}
 
-            {filteredPets.length === 0 && !loading && (
+            {pets.length === 0 && !loading && (
               <div className="text-center py-12">
                 <div className="text-6xl text-gray-300 mb-4">🔍</div>
                 <h3 className="text-xl font-semibold text-gray-600 mb-2">No pets found</h3>

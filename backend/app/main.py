@@ -97,7 +97,8 @@ def read_root():
 
 @app.get("/health", tags=["Health"])
 def health_check():
-    return {"status": "healthy"}
+    """Simple health check endpoint - no database required, perfect for keeping Render awake"""
+    return {"status": "ok", "message": "Backend is running"}
 
 @app.get("/cors-debug", tags=["Debug"])
 def cors_debug():
@@ -117,6 +118,11 @@ def cors_test():
         "credentials_enabled": use_credentials
     }
 
+
+@app.get("/health", tags=["Health"])
+def health_check():
+    """Simple health check endpoint - no database required, perfect for keeping Render awake"""
+    return {"status": "ok", "message": "Backend is running"}
 
 @app.get("/db-test", tags=["Database"])
 def test_database(db: Session = Depends(get_db)):
@@ -308,6 +314,7 @@ def get_pets(
     city: Optional[str] = None,
     state: Optional[str] = None,
     breed: Optional[str] = None,
+    search: Optional[str] = None,
     include_completeness: bool = False,
     db: Session = Depends(get_db)
 ):
@@ -327,7 +334,8 @@ def get_pets(
             age_max=age_max,
             city=city,
             state=state,
-            breed=breed
+            breed=breed,
+            search=search
         )
         
         total = crud.PetCRUD.get_pets_count(
