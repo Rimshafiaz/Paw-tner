@@ -349,7 +349,8 @@ def get_pets(
             age_max=age_max,
             city=city,
             state=state,
-            breed=breed
+            breed=breed,
+            search=search
         )
         
         return schemas.PetListResponse(

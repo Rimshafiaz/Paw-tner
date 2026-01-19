@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
-from typing import List, Optional
+from typing import List, Optional, Union
 from . import models, schemas
 
 class PetCRUD:
@@ -19,23 +19,70 @@ class PetCRUD:
     @staticmethod
     def _apply_pet_filters(query, pet_type=None, size=None, adoption_status=None, shelter_id=None, 
                           gender=None, age_min=None, age_max=None, city=None, state=None, breed=None, search=None):
+        # Convert string parameters to enum instances for proper comparison
         if pet_type:
-            query = query.filter(models.Pet.pet_type == pet_type)
+            # Handle both string and enum types
+            if isinstance(pet_type, str):
+                try:
+                    pet_type_enum = models.PetType(pet_type.lower())
+                except ValueError:
+                    # Invalid pet type, skip filter
+                    pass
+                else:
+                    query = query.filter(models.Pet.pet_type == pet_type_enum)
+            else:
+                query = query.filter(models.Pet.pet_type == pet_type)
+        
         if size:
-            query = query.filter(models.Pet.size == size)
+            # Handle both string and enum types
+            if isinstance(size, str):
+                try:
+                    size_enum = models.PetSize(size.lower())
+                except ValueError:
+                    # Invalid size, skip filter
+                    pass
+                else:
+                    query = query.filter(models.Pet.size == size_enum)
+            else:
+                query = query.filter(models.Pet.size == size)
+        
         if adoption_status:
-            query = query.filter(models.Pet.adoption_status == adoption_status)
+            # Handle both string and enum types
+            if isinstance(adoption_status, str):
+                try:
+                    status_enum = models.AdoptionStatus(adoption_status.lower())
+                except ValueError:
+                    # Invalid status, skip filter
+                    pass
+                else:
+                    query = query.filter(models.Pet.adoption_status == status_enum)
+            else:
+                query = query.filter(models.Pet.adoption_status == adoption_status)
+        
         if shelter_id:
             query = query.filter(models.Pet.shelter_id == shelter_id)
         
         if gender:
             query = query.filter(models.Pet.gender == gender)
+        
         if breed:
             query = query.filter(models.Pet.breed.ilike(f"%{breed}%"))
+        
         if age_min is not None:
-            query = query.filter(models.Pet.age_years >= age_min)
+            # Convert to int if it's a string
+            try:
+                age_min_int = int(age_min) if isinstance(age_min, str) else age_min
+                query = query.filter(models.Pet.age_years >= age_min_int)
+            except (ValueError, TypeError):
+                pass
+        
         if age_max is not None:
-            query = query.filter(models.Pet.age_years <= age_max)
+            # Convert to int if it's a string
+            try:
+                age_max_int = int(age_max) if isinstance(age_max, str) else age_max
+                query = query.filter(models.Pet.age_years <= age_max_int)
+            except (ValueError, TypeError):
+                pass
         
         # Search parameter searches both name and breed
         if search:
@@ -60,13 +107,13 @@ class PetCRUD:
         db: Session, 
         skip: int = 0, 
         limit: int = 20,
-        pet_type: Optional[models.PetType] = None,
-        size: Optional[models.PetSize] = None,
-        adoption_status: Optional[models.AdoptionStatus] = None,
+        pet_type: Optional[Union[str, models.PetType]] = None,
+        size: Optional[Union[str, models.PetSize]] = None,
+        adoption_status: Optional[Union[str, models.AdoptionStatus]] = None,
         shelter_id: Optional[int] = None,
         gender: Optional[str] = None,
-        age_min: Optional[int] = None,
-        age_max: Optional[int] = None,
+        age_min: Optional[Union[int, str]] = None,
+        age_max: Optional[Union[int, str]] = None,
         city: Optional[str] = None,
         state: Optional[str] = None,
         breed: Optional[str] = None,
@@ -81,13 +128,13 @@ class PetCRUD:
     @staticmethod
     def get_pets_count(
         db: Session,
-        pet_type: Optional[models.PetType] = None,
-        size: Optional[models.PetSize] = None,
-        adoption_status: Optional[models.AdoptionStatus] = None,
+        pet_type: Optional[Union[str, models.PetType]] = None,
+        size: Optional[Union[str, models.PetSize]] = None,
+        adoption_status: Optional[Union[str, models.AdoptionStatus]] = None,
         shelter_id: Optional[int] = None,
         gender: Optional[str] = None,
-        age_min: Optional[int] = None,
-        age_max: Optional[int] = None,
+        age_min: Optional[Union[int, str]] = None,
+        age_max: Optional[Union[int, str]] = None,
         city: Optional[str] = None,
         state: Optional[str] = None,
         breed: Optional[str] = None,

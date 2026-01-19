@@ -49,7 +49,7 @@ function AdopterHome() {
       const params = new URLSearchParams({
         limit: limit,
         skip: skip,
-        adoption_status: 'AVAILABLE'
+        adoption_status: 'available'
       })
 
       const currentSearch = searchValue !== null ? searchValue : searchTerm
